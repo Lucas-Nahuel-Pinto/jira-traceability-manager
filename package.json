@@ -1,0 +1,30 @@
+{
+  "name": "jira-traceability-manager",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Panoramic Jira traceability dashboard: snapshot pipeline + single-file 5-tab app",
+  "license": "MIT",
+  "scripts": {
+    "trace:pull": "bun scripts/fetch-jira.ts",
+    "trace:refresh": "bun scripts/fetch-jira.ts && bun run build",
+    "build": "vite build",
+    "dev": "vite",
+    "test": "bun test",
+    "types:check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format:check": "prettier --check \"**/*.{json,yml,yaml,css,html}\" --ignore-path .prettierignore",
+    "format:fix": "prettier --write \"**/*.{json,yml,yaml,css,html}\" --ignore-path .prettierignore"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.16.0",
+    "@types/bun": "^1.4.2",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.28.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.8.3",
+    "vite": "^8.3.2",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}
