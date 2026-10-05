@@ -6,7 +6,7 @@ import { injectStyles } from './styles.ts';
 import { renderAlerts } from './views/alerts.ts';
 import { renderGraph } from './views/graph.ts';
 import { renderMatrix } from './views/matrix.ts';
-import { renderMetrics } from './views/placeholders.ts';
+import { renderMetrics } from './views/metrics.ts';
 import { renderTree } from './views/tree.ts';
 
 const TABS: { id: TabId, label: string }[] = [
