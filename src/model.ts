@@ -1,4 +1,5 @@
 import type { TraceNode } from '../scripts/lib/trace-types.ts';
+import type { Filters } from './state.ts';
 import { snapshot } from './data.ts';
 
 export const meta = snapshot.meta;
@@ -7,6 +8,24 @@ export const edges = snapshot.edges;
 
 export const issues: TraceNode[] = nodes.filter(node => node.kind === 'issue');
 export const nodeByKey = new Map<string, TraceNode>(nodes.map(node => [node.key, node]));
+
+function uniqueSorted(values: (string | undefined)[]): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b));
+}
+
+export const issueTypes = uniqueSorted(issues.map(issue => issue.issueType));
+export const statuses = uniqueSorted(issues.map(issue => issue.status));
+export const components = uniqueSorted(issues.flatMap(issue => issue.components ?? []));
+
+export function passesFilters(node: TraceNode, filters: Filters): boolean {
+  if (node.kind !== 'issue') { return true; }
+  if (filters.issueTypes.length > 0 && !filters.issueTypes.includes(node.issueType ?? '')) { return false; }
+  if (filters.statuses.length > 0 && !filters.statuses.includes(node.status ?? '')) { return false; }
+  if (filters.components.length > 0 && !(node.components ?? []).some(component => filters.components.includes(component))) {
+    return false;
+  }
+  return true;
+}
 
 const childrenIndex = new Map<string, string[]>();
 const parentsIndex = new Map<string, string[]>();

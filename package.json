@@ -17,6 +17,9 @@
     "format:check": "prettier --check \"**/*.{json,yml,yaml,css,html}\" --ignore-path .prettierignore",
     "format:fix": "prettier --write \"**/*.{json,yml,yaml,css,html}\" --ignore-path .prettierignore"
   },
+  "dependencies": {
+    "cytoscape": "^3.34.3"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.0",
     "@types/bun": "^1.4.2",

@@ -19,6 +19,30 @@ function linkButton(node: TraceNode, label: string): string {
   return `<button class="link-item" data-select="${escapeHtml(node.key)}">${escapeHtml(label)} <span class="lk">${escapeHtml(node.key)}</span></button>`;
 }
 
+const VERBS: Record<string, { out: string, in: string }> = {
+  'link:blocks': { out: '⊣ bloquea', in: '⊣ bloqueado por' },
+  'link:blocking': { out: '⊣ bloquea', in: '⊣ bloqueado por' },
+  'link:relates': { out: '↔ relacionado', in: '↔ relacionado' },
+  'link:duplicate': { out: 'duplica', in: 'duplicado por' },
+  'link:cloners': { out: 'clona', in: 'clonado por' },
+  'link:test': { out: 'prueba', in: 'probado por' },
+  'link:test-execute': { out: 'ejecuta', in: 'ejecutado por' },
+  'link:test-design': { out: 'diseña', in: 'diseñado por' },
+  'link:defect': { out: 'defecto en', in: '↔ defecto de' },
+  'link:problem/incident': { out: 'problema/incidente', in: 'afectado por' },
+  'link:dependencies': { out: 'depende de', in: 'requiere' },
+};
+
+function edgeLabel(kind: string, outward: boolean): string {
+  const verb = VERBS[kind];
+  if (verb) {
+    if (verb.out === verb.in) { return `↔ ${verb.out.replace('↔ ', '')}`; }
+    return outward ? `${verb.out} →` : `← ${verb.in}`;
+  }
+  const name = kind.replace('link:', '');
+  return outward ? `→ ${name}` : `← ${name}`;
+}
+
 export function renderDetail(container: HTMLElement, selectedKey: string | null, search: string): void {
   if (!selectedKey) {
     container.classList.remove('visible');
@@ -39,13 +63,13 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
   let linksHtml = '';
   if (parents.length > 0) {
     linksHtml += '<h3>Jerarquía</h3>';
-    linksHtml += parents.map(parent => linkButton(parent, 'padre de ')).join('');
+    linksHtml += parents.map(parent => linkButton(parent, '↑ padre')).join('');
   }
   if (children.length > 0 && parents.length === 0) {
     linksHtml += '<h3>Jerarquía</h3>';
   }
   if (children.length > 0) {
-    linksHtml += children.map(child => linkButton(child, 'hijo ')).join('');
+    linksHtml += children.map(child => linkButton(child, '↓ hijo')).join('');
   }
 
   const others = related.filter(edge => !parents.some(p => p.key === edge.from && edge.to === selectedKey && edge.kind === 'hierarchy'));
@@ -60,8 +84,7 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
         linksHtml += linkButton(other, `${edge.kind}: `);
         continue;
       }
-      const arrow = outward ? '→' : '←';
-      linksHtml += linkButton(other, `${arrow} ${edge.kind.replace('link:', '')} `);
+      linksHtml += linkButton(other, `${edgeLabel(edge.kind, outward)} `);
     }
   }
 
@@ -70,6 +93,7 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
   container.innerHTML = `
     <div class="key">${escapeHtml(node.key)}</div>
     <h2>${escapeHtml(node.summary ?? '')}</h2>
+    <a class="jira-link" href="${escapeHtml(node.url)}" target="_blank" rel="noopener">Abrir en Jira →</a>
     <div class="row"><span class="label">Tipo</span><span>${escapeHtml(node.issueType ?? node.kind)}</span></div>
     <div class="row"><span class="label">Estado</span><span>${statusChip(node)}</span></div>
     <div class="row"><span class="label">Asignado</span><span>${escapeHtml(node.assignee ?? 'sin asignar')}</span></div>
