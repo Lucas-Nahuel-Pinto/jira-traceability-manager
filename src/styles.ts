@@ -113,9 +113,11 @@ body {
 }
 .filters .clear:hover { color: var(--text); border-color: var(--accent); }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.dot.done { background: var(--green); }
-.dot.indeterminate { background: var(--amber); }
-.dot.todo { background: var(--muted); }
+.node-row.flash { animation: row-flash 1.4s ease-out; }
+@keyframes row-flash {
+  0% { background: rgba(79, 140, 255, 0.55); border-color: rgba(79, 140, 255, 0.95); }
+  100% { background: rgba(79, 140, 255, 0.15); border-color: rgba(79, 140, 255, 0.45); }
+}
 .alert-mark { color: var(--red); font-weight: 700; flex: none; font-size: 12px; }
 .view.graph-mode { display: flex; flex-direction: column; padding: 10px; overflow: hidden; }
 .graph-wrap {

@@ -29,22 +29,22 @@ export function passesFilters(node: TraceNode, filters: Filters): boolean {
 
 const TYPE_COLORS: Record<string, string> = {
   'Epic': '#d29922',
-  'Story': '#4f8cff',
+  'Story': '#3b6cf0',
   'Bug': '#f85149',
   'Task': '#8b94a7',
   'Test': '#3fb950',
   'Test Plan': '#a371f7',
-  'Test Execution': '#a371f7',
-  'Test Set': '#a371f7',
-  'Test Run': '#a371f7',
-  'Precondition': '#a371f7',
-  'Improvement': '#2ea8ff',
-  'Defect': '#ff7b72',
-  'Tech Story': '#6e7681',
-  'Tech Debt': '#6e7681',
+  'Test Execution': '#ff7b9c',
+  'Test Set': '#39c5cf',
+  'Test Run': '#c9d1d9',
+  'Precondition': '#ffd166',
+  'Improvement': '#ff922b',
+  'Defect': '#db61a2',
+  'Tech Story': '#7c6cff',
+  'Tech Debt': '#58c4ff',
 };
 
-const KIND_COLORS: Record<string, string> = { component: '#2ea8ff', sprint: '#d29922' };
+const KIND_COLORS: Record<string, string> = { component: '#6e7681', sprint: '#2dd4a7' };
 
 export function typeColorOf(issueType: string | undefined): string {
   return TYPE_COLORS[issueType ?? ''] ?? '#6e7681';

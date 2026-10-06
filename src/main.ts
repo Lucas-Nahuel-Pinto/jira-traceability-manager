@@ -87,12 +87,27 @@ function renderView(): void {
   else { renderMetrics(viewEl); }
 }
 
+function focusSelectedInTree(): void {
+  const { tab, selectedKey } = getState();
+  if (tab !== 'tree' || !selectedKey) { return; }
+  const row = viewEl.querySelector<HTMLElement>(`[data-select="${selectedKey}"]`);
+  if (!row) { return; }
+  const rowRect = row.getBoundingClientRect();
+  const viewRect = viewEl.getBoundingClientRect();
+  const fullyVisible = rowRect.top >= viewRect.top && rowRect.bottom <= viewRect.bottom;
+  if (fullyVisible) { return; }
+  row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  row.classList.add('flash');
+  window.setTimeout(() => row.classList.remove('flash'), 1400);
+}
+
 function render(): void {
   renderTabs();
   renderFilters();
   renderView();
   const { selectedKey, search } = getState();
   renderDetail(detailEl, selectedKey, search);
+  focusSelectedInTree();
 }
 
 searchEl.addEventListener('input', () => setSearch(searchEl.value));

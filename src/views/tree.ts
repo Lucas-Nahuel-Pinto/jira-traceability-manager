@@ -1,6 +1,6 @@
 import type { TraceNode } from '../../scripts/lib/trace-types.ts';
 import { escapeHtml } from '../components/detail-panel.ts';
-import { alertsByType, computeAlerts, issues, matchesSearch, parentsOf, passesFilters } from '../model.ts';
+import { alertsByType, computeAlerts, issues, matchesSearch, nodeColor, parentsOf, passesFilters } from '../model.ts';
 import { getState, select } from '../state.ts';
 
 const nodeAlerts = alertsByType(computeAlerts());
@@ -41,7 +41,7 @@ function renderNode(node: TraceNode, visible: Set<string>, query: string): strin
   return `
     <li>
       <button class="node-row${selected}" data-select="${escapeHtml(node.key)}" data-url="${escapeHtml(node.url)}">
-        <span class="dot ${category}"></span>
+        <span class="dot" style="background:${nodeColor(node)}"></span>
         <span class="nk">${escapeHtml(node.key)}</span>
         <span class="ntype">${escapeHtml(node.issueType ?? '')}</span>
         <span class="ns">${escapeHtml(node.summary ?? '')}</span>
