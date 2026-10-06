@@ -1,28 +1,7 @@
 import cytoscape from 'cytoscape';
 import { escapeHtml } from '../components/detail-panel.ts';
-import { edges, issues, issueTypes, nodeByKey, passesFilters } from '../model.ts';
+import { edges, issues, issueTypes, nodeByKey, passesFilters, typeColorOf } from '../model.ts';
 import { getState, select } from '../state.ts';
-
-const TYPE_COLORS: Record<string, string> = {
-  'Epic': '#d29922',
-  'Story': '#4f8cff',
-  'Bug': '#f85149',
-  'Task': '#8b94a7',
-  'Test': '#3fb950',
-  'Test Plan': '#a371f7',
-  'Test Execution': '#a371f7',
-  'Test Set': '#a371f7',
-  'Test Run': '#a371f7',
-  'Precondition': '#a371f7',
-  'Improvement': '#2ea8ff',
-  'Defect': '#ff7b72',
-  'Tech Story': '#6e7681',
-  'Tech Debt': '#6e7681',
-};
-
-function colorFor(issueType: string | undefined): string {
-  return TYPE_COLORS[issueType ?? ''] ?? '#6e7681';
-}
 
 let instance: cytoscape.Core | null = null;
 let buildSig = '';
@@ -57,7 +36,7 @@ function updateInstance(cy: cytoscape.Core): void {
 
 function legendHtml(): string {
   const present = issueTypes.map((type) => {
-    const color = colorFor(type);
+    const color = typeColorOf(type);
     return `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;font-size:11px;color:var(--muted);"><span class="dot" style="background:${color}"></span>${escapeHtml(type)}</span>`;
   }).join('');
   return `<div style="position:absolute;left:10px;bottom:8px;background:rgba(22,27,36,0.85);border:1px solid var(--border);border-radius:6px;padding:5px 9px;">${present}</div>`;
@@ -85,7 +64,7 @@ export function renderGraph(container: HTMLElement): void {
   const elements: cytoscape.ElementDefinition[] = visibleIssues.map(issue => ({
     group: 'nodes',
     data: { id: issue.key, key: issue.key, issueType: issue.issueType },
-    style: { 'background-color': colorFor(issue.issueType) },
+    style: { 'background-color': typeColorOf(issue.issueType) },
   }));
   for (const edge of edges) {
     if (!visibleKeys.has(edge.from) || !visibleKeys.has(edge.to)) { continue; }

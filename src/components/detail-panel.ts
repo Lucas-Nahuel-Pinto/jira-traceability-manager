@@ -1,5 +1,5 @@
 import type { TraceNode } from '../../scripts/lib/trace-types.ts';
-import { childrenOf, edges, isDone, matchesSearch, nodeByKey, parentsOf } from '../model.ts';
+import { childrenOf, edges, isDone, matchesSearch, nodeByKey, nodeColor, parentsOf } from '../model.ts';
 import { select } from '../state.ts';
 
 export function statusChip(node: TraceNode): string {
@@ -15,32 +15,45 @@ export function escapeHtml(value: string): string {
     .replaceAll('"', '&quot;');
 }
 
-function linkButton(node: TraceNode, label: string): string {
-  return `<button class="link-item" data-select="${escapeHtml(node.key)}">${escapeHtml(label)} <span class="lk">${escapeHtml(node.key)}</span></button>`;
+function linkButton(node: TraceNode, arrow: string): string {
+  const color = nodeColor(node);
+  const summary = node.summary
+    ? `<span class="ls" title="${escapeHtml(node.summary)}">${escapeHtml(node.summary)}</span>`
+    : '';
+  return `
+    <button class="link-item" data-select="${escapeHtml(node.key)}">
+      <span class="la">${arrow}</span>
+      <span class="dot" style="background:${color}"></span>
+      <span class="lk">${escapeHtml(node.key)}</span>
+      ${summary}
+    </button>`;
 }
 
 const VERBS: Record<string, { out: string, in: string }> = {
-  'link:blocks': { out: '⊣ bloquea', in: '⊣ bloqueado por' },
-  'link:blocking': { out: '⊣ bloquea', in: '⊣ bloqueado por' },
-  'link:relates': { out: '↔ relacionado', in: '↔ relacionado' },
+  'link:blocks': { out: 'bloquea', in: 'bloqueado por' },
+  'link:blocking': { out: 'bloquea', in: 'bloqueado por' },
+  'link:relates': { out: 'relacionado', in: 'relacionado' },
   'link:duplicate': { out: 'duplica', in: 'duplicado por' },
   'link:cloners': { out: 'clona', in: 'clonado por' },
   'link:test': { out: 'prueba', in: 'probado por' },
   'link:test-execute': { out: 'ejecuta', in: 'ejecutado por' },
   'link:test-design': { out: 'diseña', in: 'diseñado por' },
-  'link:defect': { out: 'defecto en', in: '↔ defecto de' },
+  'link:defect': { out: 'defecto en', in: 'defecto de' },
   'link:problem/incident': { out: 'problema/incidente', in: 'afectado por' },
-  'link:dependencies': { out: 'depende de', in: 'requiere' },
+  'link:dependencies': { out: 'depende de', in: 'es dependencia para' },
 };
 
-function edgeLabel(kind: string, outward: boolean): string {
+function relationLabel(kind: string, outward: boolean): string {
+  if (kind === 'component') { return 'componente'; }
+  if (kind === 'sprint') { return 'sprint'; }
   const verb = VERBS[kind];
-  if (verb) {
-    if (verb.out === verb.in) { return `↔ ${verb.out.replace('↔ ', '')}`; }
-    return outward ? `${verb.out} →` : `← ${verb.in}`;
-  }
-  const name = kind.replace('link:', '');
-  return outward ? `→ ${name}` : `← ${name}`;
+  if (verb) { return outward ? verb.out : verb.in; }
+  return kind.replace(/^link:/, '');
+}
+
+function groupSection(label: string, items: { node: TraceNode, arrow: string }[]): string {
+  return `<h3>${escapeHtml(label)}<span class="count-pill">${items.length}</span></h3>${
+    items.map(item => linkButton(item.node, item.arrow)).join('')}`;
 }
 
 export function renderDetail(container: HTMLElement, selectedKey: string | null, search: string): void {
@@ -58,34 +71,30 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
 
   const parents = parentsOf(selectedKey);
   const children = childrenOf(selectedKey);
-  const related = edges.filter(edge => edge.from === selectedKey || edge.to === selectedKey);
 
   let linksHtml = '';
   if (parents.length > 0) {
-    linksHtml += '<h3>Jerarquía</h3>';
-    linksHtml += parents.map(parent => linkButton(parent, '↑ padre')).join('');
-  }
-  if (children.length > 0 && parents.length === 0) {
-    linksHtml += '<h3>Jerarquía</h3>';
+    linksHtml += groupSection('padres', parents.map(node => ({ node, arrow: '' })));
   }
   if (children.length > 0) {
-    linksHtml += children.map(child => linkButton(child, '↓ hijo')).join('');
+    linksHtml += groupSection('hijos', children.map(node => ({ node, arrow: '' })));
   }
 
-  const others = related.filter(edge => !parents.some(p => p.key === edge.from && edge.to === selectedKey && edge.kind === 'hierarchy'));
-  if (others.length > 0) {
-    linksHtml += '<h3>Vínculos</h3>';
-    for (const edge of others) {
-      const outward = edge.from === selectedKey;
-      const other = nodeByKey.get(outward ? edge.to : edge.from);
-      if (!other) { continue; }
-      if (edge.kind === 'hierarchy') { continue; }
-      if (edge.kind === 'component' || edge.kind === 'sprint') {
-        linksHtml += linkButton(other, `${edge.kind}: `);
-        continue;
-      }
-      linksHtml += linkButton(other, `${edgeLabel(edge.kind, outward)} `);
-    }
+  const groups = new Map<string, { node: TraceNode, arrow: string }[]>();
+  for (const edge of edges) {
+    if (edge.kind === 'hierarchy') { continue; }
+    if (edge.from !== selectedKey && edge.to !== selectedKey) { continue; }
+    const outward = edge.from === selectedKey;
+    const other = nodeByKey.get(outward ? edge.to : edge.from);
+    if (!other) { continue; }
+    const label = relationLabel(edge.kind, outward);
+    const bucket = groups.get(label) ?? [];
+    bucket.push({ node: other, arrow: outward ? '→' : '←' });
+    groups.set(label, bucket);
+  }
+  const sortedGroups = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
+  for (const [label, items] of sortedGroups) {
+    linksHtml += groupSection(label, items);
   }
 
   const searchable = matchesSearch(node, search);

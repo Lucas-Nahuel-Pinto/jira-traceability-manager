@@ -27,6 +27,34 @@ export function passesFilters(node: TraceNode, filters: Filters): boolean {
   return true;
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  'Epic': '#d29922',
+  'Story': '#4f8cff',
+  'Bug': '#f85149',
+  'Task': '#8b94a7',
+  'Test': '#3fb950',
+  'Test Plan': '#a371f7',
+  'Test Execution': '#a371f7',
+  'Test Set': '#a371f7',
+  'Test Run': '#a371f7',
+  'Precondition': '#a371f7',
+  'Improvement': '#2ea8ff',
+  'Defect': '#ff7b72',
+  'Tech Story': '#6e7681',
+  'Tech Debt': '#6e7681',
+};
+
+const KIND_COLORS: Record<string, string> = { component: '#2ea8ff', sprint: '#d29922' };
+
+export function typeColorOf(issueType: string | undefined): string {
+  return TYPE_COLORS[issueType ?? ''] ?? '#6e7681';
+}
+
+export function nodeColor(node: TraceNode): string {
+  if (node.kind !== 'issue') { return KIND_COLORS[node.kind] ?? '#6e7681'; }
+  return typeColorOf(node.issueType);
+}
+
 const childrenIndex = new Map<string, string[]>();
 const parentsIndex = new Map<string, string[]>();
 

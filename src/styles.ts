@@ -58,12 +58,19 @@ body {
 .detail .links { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
 .detail .links h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 8px 0 6px; }
 .link-item {
-  display: block; width: 100%; text-align: left; background: var(--panel-2);
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  background: var(--panel-2);
   border: 1px solid var(--border); color: var(--text); border-radius: 6px;
   padding: 5px 8px; margin-bottom: 5px; font-size: 12px; cursor: pointer;
+  text-align: left;
 }
 .link-item:hover { border-color: var(--accent); }
-.link-item .lk { font-family: var(--mono); color: var(--accent); }
+.link-item .la { color: var(--muted); flex: none; width: 14px; text-align: center; font-family: var(--mono); }
+.link-item .lk { font-family: var(--mono); color: var(--accent); flex: none; }
+.link-item .ls {
+  color: var(--muted); overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; min-width: 0;
+}
 .chip {
   display: inline-block; padding: 1px 8px; border-radius: 10px;
   font-size: 11px; background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
