@@ -2,7 +2,7 @@
   "meta": {
     "schemaVersion": 1,
     "projectKey": "BK",
-    "generatedAt": "2026-10-05T16:13:43.419Z",
+    "generatedAt": "2026-10-06T14:20:42.359Z",
     "hasXray": false,
     "counts": {
       "nodes": 1114,
@@ -7240,8 +7240,8 @@
       "url": "https://upexgalaxy72.atlassian.net/browse/BK-371",
       "summary": "TMS-Defect Sync | Point a project at a Jira destination",
       "issueType": "Story",
-      "status": "Backlog",
-      "statusCategory": "new",
+      "status": "Shift-Left QA",
+      "statusCategory": "indeterminate",
       "assignee": "Airan España",
       "priority": "Medium",
       "labels": [],
@@ -7249,7 +7249,7 @@
       "sprint": "Bunkai (72) Sprint 4",
       "points": 3,
       "createdAt": "2026-08-11T06:01:35.517-0300",
-      "updatedAt": "2026-09-30T14:52:47.768-0300",
+      "updatedAt": "2026-10-05T19:32:37.257-0300",
       "resolutionDate": null,
       "parent": "BK-31"
     },
@@ -8555,7 +8555,7 @@
       "components": [],
       "sprint": "Bunkai (72) Sprint 4",
       "createdAt": "2026-08-13T19:15:45.810-0300",
-      "updatedAt": "2026-09-29T15:49:23.883-0300",
+      "updatedAt": "2026-10-05T17:51:59.338-0300",
       "resolutionDate": null,
       "parent": "BK-30"
     },
@@ -13506,7 +13506,7 @@
       ],
       "sprint": "Bunkai (72) Sprint 4",
       "createdAt": "2026-08-28T08:06:02.568-0300",
-      "updatedAt": "2026-08-31T08:10:52.493-0300",
+      "updatedAt": "2026-10-06T05:17:15.379-0300",
       "resolutionDate": null,
       "parent": "BK-514"
     },
