@@ -166,6 +166,8 @@ table.matrix { border-collapse: collapse; font-size: 12px; width: 100%; }
   font-size: 13px; text-decoration: none;
 }
 .detail .jira-link:hover { text-decoration: underline; }
+.metric-link { color: var(--accent); text-decoration: none; }
+.metric-link:hover { text-decoration: underline; }
 `;
 
 export function injectStyles(): void {
