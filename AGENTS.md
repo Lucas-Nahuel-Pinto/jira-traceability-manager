@@ -1,6 +1,6 @@
 # AGENTS.md — Jira Traceability Manager
 
-> Repo del dashboard de trazabilidad de Jira: pipeline de datos + app single-file. NO es el boilerplate QA y NO contiene skills de proceso QA. El toolbox del agente (acli, xray-cli, git-flow-master, caveman, MCPs) vive en el repo hermano `jira-traceability-harness`.
+> Repo del dashboard de trazabilidad de Jira: pipeline de datos + app single-file. NO es el boilerplate QA y NO contiene skills de proceso QA. La consola PM del agente (skills pm-status-report / pm-sprint-health / pm-alerts-to-jira, CLI `scripts/pm.ts`, acli, xray-cli, git-flow-master, caveman, MCPs) vive en el repo hermano `agentic-pm-harness`.
 
 ## Commands
 
