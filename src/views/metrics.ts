@@ -81,7 +81,9 @@ function donut(slices: { label: string, count: number, url?: string }[]): string
 }
 
 function stackedEpics(statusColors: Map<string, string>): string {
-  const progress = epicProgress(visibleIssues, parentMap(visibleEdges));
+  const epicKeys = new Set(allIssues.filter(issue => issue.issueType === 'Epic').map(issue => issue.key));
+  const progress = epicProgress(visibleIssues, parentMap(visibleEdges))
+    .filter(entry => epicKeys.has(entry.epic));
   if (progress.length === 0) { return '<div class="empty">Sin datos</div>'; }
   const rows = progress.slice(0, 12).map((entry) => {
     const segments = entry.byStatus.map((slice) => {

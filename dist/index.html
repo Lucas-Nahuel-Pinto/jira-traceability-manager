@@ -577,7 +577,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r}</span>
       <span style="margin-left:auto;font-family:var(--mono);">${t.count}</span>
     </div>`}).join(``)}</div>
-    </div>`}function V_(e){let t=C_(I_,N_(L_));return t.length===0?`<div class="empty">Sin datos</div>`:t.slice(0,12).map(t=>{let n=t.byStatus.map(n=>{let r=n.count/t.total*100,i=e.get(n.label)??`#6e7681`;return`<span title="${U(n.label)}: ${n.count}" style="width:${r}%;background:${i};"></span>`}).join(``),r=Math.round(t.done/t.total*100);return`
+    </div>`}function V_(e){let t=new Set(p.filter(e=>e.issueType===`Epic`).map(e=>e.key)),n=C_(I_,N_(L_)).filter(e=>t.has(e.epic));return n.length===0?`<div class="empty">Sin datos</div>`:n.slice(0,12).map(t=>{let n=t.byStatus.map(n=>{let r=n.count/t.total*100,i=e.get(n.label)??`#6e7681`;return`<span title="${U(n.label)}: ${n.count}" style="width:${r}%;background:${i};"></span>`}).join(``),r=Math.round(t.done/t.total*100);return`
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;">
         <span class="metric-select" data-select="${U(t.epic)}" style="width:110px;flex:none;font-family:var(--mono);">${U(t.epic)}</span>
         <span style="flex:1;display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--panel-2);">${n}</span>
