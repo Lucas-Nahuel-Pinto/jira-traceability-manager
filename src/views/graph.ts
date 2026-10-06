@@ -42,6 +42,17 @@ function updateInstance(cy: cytoscape.Core): void {
       node.toggleClass('match', matches);
       node.toggleClass('picked', traceNode?.key === selectedKey);
     });
+
+    cy.elements().removeClass('lit lit-edge faded');
+    if (selectedKey) {
+      const selected = cy.getElementById(selectedKey);
+      if (selected.nonempty() && !selected.hasClass('hidden')) {
+        const hood = selected.closedNeighborhood();
+        hood.nodes().addClass('lit');
+        hood.edges().addClass('lit-edge');
+        cy.elements().not(hood).addClass('faded');
+      }
+    }
   });
 }
 
@@ -87,8 +98,26 @@ const GRAPH_STYLE: cytoscape.StylesheetJsonBlock[] = [
   },
   { selector: '.hidden', style: { display: 'none' } },
   { selector: '.dim', style: { opacity: 0.1 } },
-  { selector: '.match', style: { 'border-width': 3, 'border-color': '#f85149' } },
-  { selector: '.picked', style: { 'border-width': 3, 'border-color': '#4f8cff' } },
+  { selector: '.faded', style: { opacity: 0.07 } },
+  {
+    selector: 'node.lit',
+    style: { 'border-width': 1.5, 'border-color': '#9ecbff', 'opacity': 1 },
+  },
+  {
+    selector: 'edge.lit-edge',
+    style: { 'line-color': '#9ecbff', 'target-arrow-color': '#9ecbff', 'width': 2.5, 'opacity': 1 },
+  },
+  { selector: 'node.match', style: { 'border-width': 3, 'border-color': '#f85149' } },
+  {
+    selector: 'node.picked',
+    style: {
+      'border-width': 3,
+      'border-color': '#4f8cff',
+      'overlay-color': '#4f8cff',
+      'overlay-padding': 8,
+      'overlay-opacity': 0.6,
+    },
+  },
 ];
 
 function wireEvents(cy: cytoscape.Core): void {
@@ -98,6 +127,9 @@ function wireEvents(cy: cytoscape.Core): void {
   });
   cy.on('tap', 'node', (event) => {
     select((event.target as cytoscape.NodeSingular).id());
+  });
+  cy.on('tap', (event) => {
+    if (event.target === cy) { select(null); }
   });
   const openInJira = (event: cytoscape.EventObject) => {
     const key = (event.target as cytoscape.NodeSingular).id();
