@@ -148,6 +148,9 @@ table.matrix { border-collapse: collapse; font-size: 12px; width: 100%; }
   position: sticky; top: 0; background: var(--panel-2); z-index: 1;
   text-align: left; color: var(--muted); font-weight: 600;
 }
+.matrix th[data-col] { cursor: pointer; user-select: none; }
+.matrix th[data-col]:hover { color: var(--text); }
+.matrix th.sorted { color: var(--accent); }
 .matrix td.count { text-align: right; font-family: var(--mono); }
 .matrix tbody tr { cursor: pointer; }
 .matrix tbody tr:hover td { background: var(--panel-2); }

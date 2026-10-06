@@ -9,6 +9,25 @@ interface Cell {
   outKeys: string[]
 }
 
+interface SortState {
+  column: number
+  dir: 'asc' | 'desc'
+}
+
+let sortState: SortState | null = null;
+
+function cellTotal(issue: TraceNode, kind: string, degree: Map<string, Map<string, Cell>>): number {
+  const cell = degree.get(issue.key)?.get(kind);
+  return cell ? cell.out + cell.in : 0;
+}
+
+function sortTh(column: number, label: string): string {
+  const active = sortState?.column === column;
+  const arrow = active ? (sortState?.dir === 'asc' ? ' ▲' : ' ▼') : '';
+  const cls = active ? ' class="sorted"' : '';
+  return `<th${cls} data-col="${column}" title="Ordenar por ${escapeHtml(label)}">${escapeHtml(label)}${arrow}</th>`;
+}
+
 function buildCells(): { kinds: string[], degree: Map<string, Map<string, Cell>> } {
   const degree = new Map<string, Map<string, Cell>>();
   const kindSet = new Set<string>();
@@ -48,17 +67,28 @@ export function renderMatrix(container: HTMLElement): void {
   const { filters, search } = getState();
   const { kinds, degree } = buildCells();
   const filtered = issues.filter(issue => passesFilters(issue, filters));
-  const visibleIssues = (search
+  const searched = (search
     ? filtered.filter((issue) => {
         const needle = search.toLowerCase();
         return issue.key.toLowerCase().includes(needle)
           || (issue.summary ?? '').toLowerCase().includes(needle)
           || (issue.assignee ?? '').toLowerCase().includes(needle);
       })
-    : filtered.filter(issue => linkCounts(issue, degree) > 0))
-    .sort((a, b) => linkCounts(b, degree) - linkCounts(a, degree));
+    : filtered.filter(issue => linkCounts(issue, degree) > 0));
+  const visibleIssues = [...searched].sort((a, b) => {
+    const current = sortState;
+    if (!current) { return linkCounts(b, degree) - linkCounts(a, degree); }
+    if (current.column === 0) {
+      const cmp = a.key.localeCompare(b.key);
+      return current.dir === 'asc' ? cmp : -cmp;
+    }
+    const kind = kinds[current.column - 1] ?? '';
+    const diff = cellTotal(a, kind, degree) - cellTotal(b, kind, degree);
+    if (diff !== 0) { return current.dir === 'asc' ? diff : -diff; }
+    return a.key.localeCompare(b.key);
+  });
 
-  const header = kinds.map(kind => `<th>${escapeHtml(kind.replace('link:', ''))}</th>`).join('');
+  const header = kinds.map((kind, index) => sortTh(index + 1, kind.replace('link:', ''))).join('');
   const body = visibleIssues.map((issue) => {
     const byKind = degree.get(issue.key);
     const cells = kinds.map((kind) => {
@@ -90,10 +120,10 @@ export function renderMatrix(container: HTMLElement): void {
   }).join('');
 
   container.innerHTML = `
-    <div class="summary-line">${visibleIssues.length} issues con vínculos · ${kinds.length} tipos de vínculo · celda = ${'→'} salientes / ${'←'} entrantes (hover = claves)</div>
+    <div class="summary-line">${visibleIssues.length} issues con vínculos · ${kinds.length} tipos de vínculo · celda = ${'→'} salientes / ${'←'} entrantes (hover = claves) · click en cabecera = ordenar</div>
     <div class="matrix-wrap">
       <table class="matrix">
-        <thead><tr><th>Issue</th>${header}</tr></thead>
+        <thead><tr>${sortTh(0, 'Issue')}${header}</tr></thead>
         <tbody>${body}</tbody>
       </table>
     </div>
@@ -107,5 +137,17 @@ export function renderMatrix(container: HTMLElement): void {
   `;
   container.querySelectorAll<HTMLTableRowElement>('tr[data-select]').forEach((row) => {
     row.addEventListener('click', () => select(row.dataset.select ?? null));
+  });
+  container.querySelectorAll<HTMLTableCellElement>('th[data-col]').forEach((th) => {
+    th.addEventListener('click', () => {
+      const column = Number(th.dataset.col);
+      if (sortState && sortState.column === column) {
+        sortState = { column, dir: sortState.dir === 'asc' ? 'desc' : 'asc' };
+      }
+      else {
+        sortState = { column, dir: 'asc' };
+      }
+      renderMatrix(container);
+    });
   });
 }

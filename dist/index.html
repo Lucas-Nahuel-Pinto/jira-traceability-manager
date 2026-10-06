@@ -174,6 +174,9 @@ table.matrix { border-collapse: collapse; font-size: 12px; width: 100%; }
   position: sticky; top: 0; background: var(--panel-2); z-index: 1;
   text-align: left; color: var(--muted); font-weight: 600;
 }
+.matrix th[data-col] { cursor: pointer; user-select: none; }
+.matrix th[data-col]:hover { color: var(--text); }
+.matrix th.sorted { color: var(--accent); }
 .matrix td.count { text-align: right; font-family: var(--mono); }
 .matrix tbody tr { cursor: pointer; }
 .matrix tbody tr:hover td { background: var(--panel-2); }
@@ -539,7 +542,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       <div id="cy" style="width:100%;height:100%;"></div>
       ${c_()}
       <div class="graph-overlay">Calculando distribución del grafo…</div>
-    </div>`,i_=!0,window.setTimeout(()=>{let t=e.querySelector(`#cy`),n=e.querySelector(`.graph-overlay`);if(!e.querySelector(`.graph-wrap`)||!t||!n){i_=!1;return}let r=!1,i=()=>{r||(r=!0,n.remove(),i_=!1)},a=o_(),o=a_.get(a),s=f_(o),c;try{c=Qg({container:t,elements:s,style:l_,layout:{name:`preset`},wheelSensitivity:.25,minZoom:.15,maxZoom:3})}catch(e){console.error(`[graph] no se pudo crear el grafo`,e),i();return}if(u_(c),n_=c,r_=a,s_(c),o){c.layout({name:`preset`,fit:!0,padding:30}).run(),i();return}c.one(`layoutstop`,()=>{d_(c,a),i()}),window.setTimeout(i,15e3);try{c.layout({name:`fcose`,animate:!1,randomize:!0,quality:`default`,maxIterations:500,nodeDimensionsIncludeLabels:!1,padding:30}).run()}catch(e){console.error(`[graph] fcose falló, usando grid`,e);try{c.layout({name:`grid`,animate:!1,padding:30}).run(),d_(c,a)}catch{}i()}},50)}function h_(){let e=new Map,t=new Set;for(let n of f){t.add(n.kind);for(let[t,r]of[[n.from,`out`],[n.to,`in`]]){let i=e.get(t);i||(i=new Map,e.set(t,i));let a=i.get(n.kind);a||(a={out:0,in:0,outKeys:[]},i.set(n.kind,a)),r===`out`?(a.out++,a.outKeys.length<12&&a.outKeys.push(n.to)):a.in++}}return{kinds:[...t].sort((e,t)=>e.localeCompare(t)),degree:e}}function g_(e,t){let n=t.get(e.key);if(!n)return 0;let r=0;for(let e of n.values())r+=e.out+e.in;return r}function __(e){let{filters:t,search:n}=P(),{kinds:r,degree:i}=h_(),a=p.filter(e=>y(e,t)),o=(n?a.filter(e=>{let t=n.toLowerCase();return e.key.toLowerCase().includes(t)||(e.summary??``).toLowerCase().includes(t)||(e.assignee??``).toLowerCase().includes(t)}):a.filter(e=>g_(e,i)>0)).sort((e,t)=>g_(t,i)-g_(e,i)),s=r.map(e=>`<th>${U(e.replace(`link:`,``))}</th>`).join(``),c=o.map(e=>{let t=i.get(e.key),n=r.map(e=>{let n=t?.get(e);return n?`<td class="count"${n.outKeys.length>0?` title="→ ${U(n.outKeys.join(`, `))}"`:``}>${n.out>0?`<span class="dir-out">→${n.out}</span>`:``}${n.in>0?`<span class="dir-in"> ←${n.in}</span>`:``}</td>`:`<td class="count">·</td>`}).join(``);return`
+    </div>`,i_=!0,window.setTimeout(()=>{let t=e.querySelector(`#cy`),n=e.querySelector(`.graph-overlay`);if(!e.querySelector(`.graph-wrap`)||!t||!n){i_=!1;return}let r=!1,i=()=>{r||(r=!0,n.remove(),i_=!1)},a=o_(),o=a_.get(a),s=f_(o),c;try{c=Qg({container:t,elements:s,style:l_,layout:{name:`preset`},wheelSensitivity:.25,minZoom:.15,maxZoom:3})}catch(e){console.error(`[graph] no se pudo crear el grafo`,e),i();return}if(u_(c),n_=c,r_=a,s_(c),o){c.layout({name:`preset`,fit:!0,padding:30}).run(),i();return}c.one(`layoutstop`,()=>{d_(c,a),i()}),window.setTimeout(i,15e3);try{c.layout({name:`fcose`,animate:!1,randomize:!0,quality:`default`,maxIterations:500,nodeDimensionsIncludeLabels:!1,padding:30}).run()}catch(e){console.error(`[graph] fcose falló, usando grid`,e);try{c.layout({name:`grid`,animate:!1,padding:30}).run(),d_(c,a)}catch{}i()}},50)}var h_=null;function g_(e,t,n){let r=n.get(e.key)?.get(t);return r?r.out+r.in:0}function __(e,t){let n=h_?.column===e,r=n?h_?.dir===`asc`?` ▲`:` ▼`:``;return`<th${n?` class="sorted"`:``} data-col="${e}" title="Ordenar por ${U(t)}">${U(t)}${r}</th>`}function v_(){let e=new Map,t=new Set;for(let n of f){t.add(n.kind);for(let[t,r]of[[n.from,`out`],[n.to,`in`]]){let i=e.get(t);i||(i=new Map,e.set(t,i));let a=i.get(n.kind);a||(a={out:0,in:0,outKeys:[]},i.set(n.kind,a)),r===`out`?(a.out++,a.outKeys.length<12&&a.outKeys.push(n.to)):a.in++}}return{kinds:[...t].sort((e,t)=>e.localeCompare(t)),degree:e}}function y_(e,t){let n=t.get(e.key);if(!n)return 0;let r=0;for(let e of n.values())r+=e.out+e.in;return r}function b_(e){let{filters:t,search:n}=P(),{kinds:r,degree:i}=v_(),a=p.filter(e=>y(e,t)),o=[...n?a.filter(e=>{let t=n.toLowerCase();return e.key.toLowerCase().includes(t)||(e.summary??``).toLowerCase().includes(t)||(e.assignee??``).toLowerCase().includes(t)}):a.filter(e=>y_(e,i)>0)].sort((e,t)=>{let n=h_;if(!n)return y_(t,i)-y_(e,i);if(n.column===0){let r=e.key.localeCompare(t.key);return n.dir===`asc`?r:-r}let a=r[n.column-1]??``,o=g_(e,a,i)-g_(t,a,i);return o===0?e.key.localeCompare(t.key):n.dir===`asc`?o:-o}),s=r.map((e,t)=>__(t+1,e.replace(`link:`,``))).join(``),c=o.map(e=>{let t=i.get(e.key),n=r.map(e=>{let n=t?.get(e);return n?`<td class="count"${n.outKeys.length>0?` title="→ ${U(n.outKeys.join(`, `))}"`:``}>${n.out>0?`<span class="dir-out">→${n.out}</span>`:``}${n.in>0?`<span class="dir-in"> ←${n.in}</span>`:``}</td>`:`<td class="count">·</td>`}).join(``);return`
       <tr data-select="${U(e.key)}">
         <td><span class="rowkey">${U(e.key)}</span> <span class="rowsummary">${U(e.summary??``)}</span></td>
         ${n}
@@ -549,10 +552,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         <td>→ bloquea</td>
         <td><span class="rowkey">${U(e.to)}</span> ${U(n?.summary??``)} ${r}</td>
       </tr>`}).join(``);e.innerHTML=`
-    <div class="summary-line">${o.length} issues con vínculos · ${r.length} tipos de vínculo · celda = → salientes / ← entrantes (hover = claves)</div>
+    <div class="summary-line">${o.length} issues con vínculos · ${r.length} tipos de vínculo · celda = → salientes / ← entrantes (hover = claves) · click en cabecera = ordenar</div>
     <div class="matrix-wrap">
       <table class="matrix">
-        <thead><tr><th>Issue</th>${s}</tr></thead>
+        <thead><tr>${__(0,`Issue`)}${s}</tr></thead>
         <tbody>${c}</tbody>
       </table>
     </div>
@@ -561,28 +564,28 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       <div class="matrix-wrap" style="max-height:280px;">
         <table class="matrix"><thead><tr><th>Bloqueante</th><th></th><th>Bloqueado</th></tr></thead><tbody>${u}</tbody></table>
       </div>`:``}
-  `,e.querySelectorAll(`tr[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null))})}function v_(e,t,n){let r=e;if(n.epicKey){let e=b_(t,n.epicKey);r=r.filter(t=>e.has(t.key)||t.key===n.epicKey)}if(n.from){let e=n.from;r=r.filter(t=>(t.createdAt??``)>=e)}if(n.to){let e=`${n.to}T23:59:59.999Z`;r=r.filter(t=>(t.createdAt??``)<=e)}return r}function y_(e,t){return e.filter(e=>t.has(e.from)&&t.has(e.to))}function b_(e,t){let n=new Map;for(let t of e){if(t.kind!==`hierarchy`)continue;let e=n.get(t.from)??[];e.push(t.to),n.set(t.from,e)}let r=new Set,i=[t];for(;i.length>0;){let e=i.pop();for(let t of n.get(e)??[])r.has(t)||(r.add(t),i.push(t))}return r}function x_(e,t){let n=0,r=0,i=0,a=0,o=0,s=Date.now();for(let t of e){let e=t.statusCategory===`done`;if(e?r++:n++,!e&&t.issueType===`Bug`){i++;let e=j_(t,s);e!==null&&e>30&&a++}o+=t.points??0}return{total:e.length,open:n,closed:r,bugsOpen:i,bugsOpen30d:a,points:o,links:t.length}}function S_(e){let t=new Map;for(let n of e){let e=n.status??`sin estado`;t.set(e,(t.get(e)??0)+1)}return[...t.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}function C_(e,t){let n=new Map;for(let r of e){let e=t.get(r.key);if(!e)continue;let i=n.get(e)??[];i.push(r),n.set(e,i)}let r=[];for(let[e,t]of n){let n=new Map,i=0;for(let e of t){let t=e.status??`sin estado`;n.set(t,(n.get(t)??0)+1),e.statusCategory===`done`&&i++}r.push({epic:e,total:t.length,done:i,byStatus:[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)})}return r.sort((e,t)=>t.total-e.total)}function w_(e){let t=new Date(Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),e.getUTCDate())),n=t.getUTCDay(),r=n===0?6:n-1;return t.setUTCDate(t.getUTCDate()-r),t.toISOString().slice(0,10)}function T_(e,t,n=6){let r=[],i=[];for(let e=n-1;e>=0;e--){let n=new Date(t);n.setUTCDate(n.getUTCDate()-e*7),i.push(w_(n))}for(let e of i)r.push({week:e,created:0,closed:0});let a=new Map(i.map((e,t)=>[e,t]));for(let t of e){if(t.createdAt){let e=a.get(w_(new Date(t.createdAt)));e!==void 0&&r[e].created++}if(t.resolutionDate){let e=a.get(w_(new Date(t.resolutionDate)));e!==void 0&&r[e].closed++}}return r}function E_(e,t){let n=new Map;for(let r of e){if(!r.points)continue;let e=t.get(r.key)??`(sin épica)`;n.set(e,(n.get(e)??0)+r.points)}return[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}function D_(e,t=8){let n=new Map;for(let t of e){if(t.statusCategory===`done`)continue;let e=t.assignee??`sin asignar`;n.set(e,(n.get(e)??0)+1)}return[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count).slice(0,t)}function O_(e){let t=new Map;for(let n of e)t.set(n.kind,(t.get(n.kind)??0)+1);return[...t.entries()].map(([e,t])=>({label:e.replace(`link:`,``),count:t})).sort((e,t)=>t.count-e.count)}function k_(e,t=10){let n=new Map;for(let t of e)n.set(t.from,(n.get(t.from)??0)+1),n.set(t.to,(n.get(t.to)??0)+1);return[...n.entries()].map(([e,t])=>({key:e,degree:t})).sort((e,t)=>t.degree-e.degree).slice(0,t)}function A_(e){return e===null?`sin fecha`:e<7?`<7d`:e<=30?`7–30d`:`>30d`}function j_(e,t){if(!e.createdAt)return null;let n=Date.parse(e.createdAt);return Number.isNaN(n)?null:(t-n)/864e5}function M_(e,t){let n=new Map;for(let r of e){if(r.issueType!==`Bug`||r.statusCategory===`done`)continue;let e=A_(j_(r,t));n.set(e,(n.get(e)??0)+1)}return[`<7d`,`7–30d`,`>30d`,`sin fecha`].map(e=>({bucket:e,count:n.get(e)??0}))}function N_(e){let t=new Map;for(let n of e)n.kind===`hierarchy`&&t.set(n.to,n.from);return t}function P_(e){let t=new Map;for(let n of e){if(n.issueType!==`Test Execution`)continue;let e=n.status??`sin estado`;t.set(e,(t.get(e)??0)+1)}return[...t.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}var F_={},I_=[],L_=[];function R_(e,t){return`hsl(${Math.round(e*360/Math.max(t,1))} 62% 55%)`}function z_(e,t){let n=Math.max(...e.map(e=>e.count),1);return e.map((e,r)=>{let i=Math.round(e.count/n*100),a=typeof t==`function`?t(r):t,o=U(e.label);return e.select?o=`<span class="metric-select" data-select="${U(e.select)}">${o}</span>`:e.url&&(o=`<a class="metric-link" href="${U(e.url)}" target="_blank" rel="noopener">${o}</a>`),`
+  `,e.querySelectorAll(`tr[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null))}),e.querySelectorAll(`th[data-col]`).forEach(t=>{t.addEventListener(`click`,()=>{let n=Number(t.dataset.col);h_=h_&&h_.column===n?{column:n,dir:h_.dir===`asc`?`desc`:`asc`}:{column:n,dir:`asc`},b_(e)})})}function x_(e,t,n){let r=e;if(n.epicKey){let e=C_(t,n.epicKey);r=r.filter(t=>e.has(t.key)||t.key===n.epicKey)}if(n.from){let e=n.from;r=r.filter(t=>(t.createdAt??``)>=e)}if(n.to){let e=`${n.to}T23:59:59.999Z`;r=r.filter(t=>(t.createdAt??``)<=e)}return r}function S_(e,t){return e.filter(e=>t.has(e.from)&&t.has(e.to))}function C_(e,t){let n=new Map;for(let t of e){if(t.kind!==`hierarchy`)continue;let e=n.get(t.from)??[];e.push(t.to),n.set(t.from,e)}let r=new Set,i=[t];for(;i.length>0;){let e=i.pop();for(let t of n.get(e)??[])r.has(t)||(r.add(t),i.push(t))}return r}function w_(e,t){let n=0,r=0,i=0,a=0,o=0,s=Date.now();for(let t of e){let e=t.statusCategory===`done`;if(e?r++:n++,!e&&t.issueType===`Bug`){i++;let e=P_(t,s);e!==null&&e>30&&a++}o+=t.points??0}return{total:e.length,open:n,closed:r,bugsOpen:i,bugsOpen30d:a,points:o,links:t.length}}function T_(e){let t=new Map;for(let n of e){let e=n.status??`sin estado`;t.set(e,(t.get(e)??0)+1)}return[...t.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}function E_(e,t){let n=new Map;for(let r of e){let e=t.get(r.key);if(!e)continue;let i=n.get(e)??[];i.push(r),n.set(e,i)}let r=[];for(let[e,t]of n){let n=new Map,i=0;for(let e of t){let t=e.status??`sin estado`;n.set(t,(n.get(t)??0)+1),e.statusCategory===`done`&&i++}r.push({epic:e,total:t.length,done:i,byStatus:[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)})}return r.sort((e,t)=>t.total-e.total)}function D_(e){let t=new Date(Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),e.getUTCDate())),n=t.getUTCDay(),r=n===0?6:n-1;return t.setUTCDate(t.getUTCDate()-r),t.toISOString().slice(0,10)}function O_(e,t,n=6){let r=[],i=[];for(let e=n-1;e>=0;e--){let n=new Date(t);n.setUTCDate(n.getUTCDate()-e*7),i.push(D_(n))}for(let e of i)r.push({week:e,created:0,closed:0});let a=new Map(i.map((e,t)=>[e,t]));for(let t of e){if(t.createdAt){let e=a.get(D_(new Date(t.createdAt)));e!==void 0&&r[e].created++}if(t.resolutionDate){let e=a.get(D_(new Date(t.resolutionDate)));e!==void 0&&r[e].closed++}}return r}function k_(e,t){let n=new Map;for(let r of e){if(!r.points)continue;let e=t.get(r.key)??`(sin épica)`;n.set(e,(n.get(e)??0)+r.points)}return[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}function A_(e,t=8){let n=new Map;for(let t of e){if(t.statusCategory===`done`)continue;let e=t.assignee??`sin asignar`;n.set(e,(n.get(e)??0)+1)}return[...n.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count).slice(0,t)}function j_(e){let t=new Map;for(let n of e)t.set(n.kind,(t.get(n.kind)??0)+1);return[...t.entries()].map(([e,t])=>({label:e.replace(`link:`,``),count:t})).sort((e,t)=>t.count-e.count)}function M_(e,t=10){let n=new Map;for(let t of e)n.set(t.from,(n.get(t.from)??0)+1),n.set(t.to,(n.get(t.to)??0)+1);return[...n.entries()].map(([e,t])=>({key:e,degree:t})).sort((e,t)=>t.degree-e.degree).slice(0,t)}function N_(e){return e===null?`sin fecha`:e<7?`<7d`:e<=30?`7–30d`:`>30d`}function P_(e,t){if(!e.createdAt)return null;let n=Date.parse(e.createdAt);return Number.isNaN(n)?null:(t-n)/864e5}function F_(e,t){let n=new Map;for(let r of e){if(r.issueType!==`Bug`||r.statusCategory===`done`)continue;let e=N_(P_(r,t));n.set(e,(n.get(e)??0)+1)}return[`<7d`,`7–30d`,`>30d`,`sin fecha`].map(e=>({bucket:e,count:n.get(e)??0}))}function I_(e){let t=new Map;for(let n of e)n.kind===`hierarchy`&&t.set(n.to,n.from);return t}function L_(e){let t=new Map;for(let n of e){if(n.issueType!==`Test Execution`)continue;let e=n.status??`sin estado`;t.set(e,(t.get(e)??0)+1)}return[...t.entries()].map(([e,t])=>({label:e,count:t})).sort((e,t)=>t.count-e.count)}var R_={},z_=[],B_=[];function V_(e,t){return`hsl(${Math.round(e*360/Math.max(t,1))} 62% 55%)`}function H_(e,t){let n=Math.max(...e.map(e=>e.count),1);return e.map((e,r)=>{let i=Math.round(e.count/n*100),a=typeof t==`function`?t(r):t,o=U(e.label);return e.select?o=`<span class="metric-select" data-select="${U(e.select)}">${o}</span>`:e.url&&(o=`<a class="metric-link" href="${U(e.url)}" target="_blank" rel="noopener">${o}</a>`),`
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;">
         <span style="width:150px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);" title="${U(e.label)}">${o}</span>
         <span style="flex:1;background:var(--panel-2);border-radius:4px;height:14px;position:relative;">
           <span style="position:absolute;left:0;top:0;bottom:0;width:${i}%;background:${a};border-radius:4px;"></span>
         </span>
         <span style="width:44px;text-align:right;font-family:var(--mono);">${e.count}</span>
-      </div>`}).join(``)||`<div class="empty">Sin datos</div>`}function B_(e){let t=e.reduce((e,t)=>e+t.count,0);if(t===0)return`<div class="empty">Sin datos</div>`;let n=0;return`
+      </div>`}).join(``)||`<div class="empty">Sin datos</div>`}function U_(e){let t=e.reduce((e,t)=>e+t.count,0);if(t===0)return`<div class="empty">Sin datos</div>`;let n=0;return`
     <div style="display:flex;gap:16px;align-items:center;">
-      <div style="width:120px;height:120px;flex:none;border-radius:50%;background:conic-gradient(${e.map((r,i)=>{let a=n/t*360;n+=r.count;let o=n/t*360;return`${R_(i,e.length)} ${a}deg ${o}deg`}).join(`, `)});"></div>
+      <div style="width:120px;height:120px;flex:none;border-radius:50%;background:conic-gradient(${e.map((r,i)=>{let a=n/t*360;n+=r.count;let o=n/t*360;return`${V_(i,e.length)} ${a}deg ${o}deg`}).join(`, `)});"></div>
       <div style="flex:1;min-width:0;max-height:170px;overflow:auto;">${e.map((t,n)=>{let r=t.url?`<a class="metric-link" href="${U(t.url)}" target="_blank" rel="noopener">${U(t.label)}</a>`:U(t.label);return`
     <div style="display:flex;gap:6px;align-items:center;font-size:12px;margin-bottom:3px;">
-      <span class="dot" style="background:${R_(n,e.length)}"></span>
+      <span class="dot" style="background:${V_(n,e.length)}"></span>
       <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r}</span>
       <span style="margin-left:auto;font-family:var(--mono);">${t.count}</span>
     </div>`}).join(``)}</div>
-    </div>`}function V_(e){let t=new Set(p.filter(e=>e.issueType===`Epic`).map(e=>e.key)),n=C_(I_,N_(L_)).filter(e=>t.has(e.epic));return n.length===0?`<div class="empty">Sin datos</div>`:n.slice(0,12).map(t=>{let n=t.byStatus.map(n=>{let r=n.count/t.total*100,i=e.get(n.label)??`#6e7681`;return`<span title="${U(n.label)}: ${n.count}" style="width:${r}%;background:${i};"></span>`}).join(``),r=Math.round(t.done/t.total*100);return`
+    </div>`}function W_(e){let t=new Set(p.filter(e=>e.issueType===`Epic`).map(e=>e.key)),n=E_(z_,I_(B_)).filter(e=>t.has(e.epic));return n.length===0?`<div class="empty">Sin datos</div>`:n.slice(0,12).map(t=>{let n=t.byStatus.map(n=>{let r=n.count/t.total*100,i=e.get(n.label)??`#6e7681`;return`<span title="${U(n.label)}: ${n.count}" style="width:${r}%;background:${i};"></span>`}).join(``),r=Math.round(t.done/t.total*100);return`
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;">
         <span class="metric-select" data-select="${U(t.epic)}" style="width:110px;flex:none;font-family:var(--mono);">${U(t.epic)}</span>
         <span style="flex:1;display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--panel-2);">${n}</span>
         <span style="width:74px;text-align:right;color:var(--muted);">${t.done}/${t.total} (${r}%)</span>
-      </div>`}).join(``)}function H_(){let e=T_(I_,new Date,6),t=Math.max(...e.map(e=>Math.max(e.created,e.closed)),1),n=t=>e.length===1?160:t/(e.length-1)*300+10,r=e=>96-e/t*80;return`
+      </div>`}).join(``)}function G_(){let e=O_(z_,new Date,6),t=Math.max(...e.map(e=>Math.max(e.created,e.closed)),1),n=t=>e.length===1?160:t/(e.length-1)*300+10,r=e=>96-e/t*80;return`
     <svg viewBox="0 0 320 110" style="width:100%;height:130px;">
       <polyline points="${e.map((e,t)=>`${n(t)},${r(e.created)}`).join(` `)}" fill="none" stroke="#4f8cff" stroke-width="2" />
       <polyline points="${e.map((e,t)=>`${n(t)},${r(e.closed)}`).join(` `)}" fill="none" stroke="#3fb950" stroke-width="2" stroke-dasharray="4 3" />
@@ -591,59 +594,59 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     <div style="font-size:11px;color:var(--muted);display:flex;gap:14px;">
       <span><span class="dot" style="background:#4f8cff;display:inline-block;"></span> creados</span>
       <span><span class="dot" style="background:#3fb950;display:inline-block;"></span> cerrados</span>
-    </div>`}function U_(){return`
+    </div>`}function K_(){return`
     <table class="matrix" style="width:100%;">
       <thead><tr><th>#</th><th>Issue</th><th>Vínculos</th></tr></thead>
-      <tbody>${k_(L_,10).map((e,t)=>`
+      <tbody>${M_(B_,10).map((e,t)=>`
     <tr data-select="${U(e.key)}">
       <td class="count">${t+1}</td>
       <td><span class="rowkey">${U(e.key)}</span></td>
       <td class="count">${e.degree}</td>
     </tr>`).join(``)}</tbody>
-    </table>`}function W_(e,t,n){return`
+    </table>`}function q_(e,t,n){return`
     <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;min-width:130px;">
       <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;">${e}</div>
       <div style="font-size:22px;font-weight:600;margin-top:2px;">${t}</div>
       ${n?`<div style="font-size:11px;color:var(--muted);">${n}</div>`:``}
-    </div>`}function G_(e,t){return`
+    </div>`}function J_(e,t){return`
     <section style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
       <h3 style="margin:0 0 10px;font-size:13px;font-weight:600;">${e}</h3>
       ${t}
-    </section>`}function K_(e){let t=p[0]?.url.replace(/\/browse\/[^/]+$/,``);return t?`${t}/issues/?jql=${encodeURIComponent(e)}`:``}function q_(){let{filters:e}=P();I_=v_(p,f,F_).filter(t=>y(t,e)),L_=y_(f,new Set(I_.map(e=>e.key)))}function J_(e){q_();let t=x_(I_,L_),n=k().length,r=S_(I_),i=new Map(r.map((e,t)=>[e.label,R_(t,r.length)])),a=r.map(e=>({...e,url:e.label===`sin estado`?void 0:K_(`project = ${u.projectKey} AND status = "${e.label}"`)})),o=new Map(p.map(e=>[e.key,e.url])),s=p.filter(e=>e.issueType===`Epic`).sort((e,t)=>e.key.localeCompare(t.key)).map(e=>`<option value="${U(e.key)}"${F_.epicKey===e.key?` selected`:``}>${U(e.key)} — ${U((e.summary??``).slice(0,60))}</option>`).join(``);e.innerHTML=`
+    </section>`}function Y_(e){let t=p[0]?.url.replace(/\/browse\/[^/]+$/,``);return t?`${t}/issues/?jql=${encodeURIComponent(e)}`:``}function X_(){let{filters:e}=P();z_=x_(p,f,R_).filter(t=>y(t,e)),B_=S_(f,new Set(z_.map(e=>e.key)))}function Z_(e){X_();let t=w_(z_,B_),n=k().length,r=T_(z_),i=new Map(r.map((e,t)=>[e.label,V_(t,r.length)])),a=r.map(e=>({...e,url:e.label===`sin estado`?void 0:Y_(`project = ${u.projectKey} AND status = "${e.label}"`)})),o=new Map(p.map(e=>[e.key,e.url])),s=p.filter(e=>e.issueType===`Epic`).sort((e,t)=>e.key.localeCompare(t.key)).map(e=>`<option value="${U(e.key)}"${R_.epicKey===e.key?` selected`:``}>${U(e.key)} — ${U((e.summary??``).slice(0,60))}</option>`).join(``);e.innerHTML=`
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
       <span style="font-size:12px;color:var(--muted);">Filtro de métricas:</span>
-      <input type="date" id="m-from" value="${F_.from??``}" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;" />
+      <input type="date" id="m-from" value="${R_.from??``}" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;" />
       <span style="color:var(--muted);">→</span>
-      <input type="date" id="m-to" value="${F_.to??``}" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;" />
+      <input type="date" id="m-to" value="${R_.to??``}" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;" />
       <select id="m-epic" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;max-width:320px;">
         <option value="">Todas las épicas</option>
         ${s}
       </select>
       <button id="m-clear" style="background:var(--panel-2);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">Limpiar</button>
-      <span style="margin-left:auto;font-size:11px;color:var(--muted);">${I_.length} issues en alcance</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted);">${z_.length} issues en alcance</span>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
-      ${W_(`Issues`,String(t.total))}
-      ${W_(`Abiertos / cerrados`,`${t.open} / ${t.closed}`)}
-      ${W_(`Bugs abiertos`,String(t.bugsOpen),`${t.bugsOpen30d} con >30 días`)}
-      ${W_(`Story points`,String(t.points))}
-      ${W_(`Vínculos`,String(t.links))}
-      ${W_(`Alertas`,String(n))}
+      ${q_(`Issues`,String(t.total))}
+      ${q_(`Abiertos / cerrados`,`${t.open} / ${t.closed}`)}
+      ${q_(`Bugs abiertos`,String(t.bugsOpen),`${t.bugsOpen30d} con >30 días`)}
+      ${q_(`Story points`,String(t.points))}
+      ${q_(`Vínculos`,String(t.links))}
+      ${q_(`Alertas`,String(n))}
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;">
-      ${G_(`¿En qué estado está el trabajo?`,B_(a))}
-      ${G_(`¿Cómo va cada épica?`,V_(i))}
-      ${G_(`¿Cuánto creamos y cuánto cerramos por semana?`,H_())}
-      ${G_(`¿Dónde se concentran los story points?`,z_(E_(I_,N_(L_)).map(e=>({...e,select:o.has(e.label)?e.label:void 0})),`#a371f7`))}
-      ${G_(`¿Quién tiene más carga?`,z_(D_(I_).map(e=>({...e,url:K_(e.label===`sin asignar`?`project = ${u.projectKey} AND assignee is EMPTY`:`project = ${u.projectKey} AND assignee = "${e.label}"`)})),`#d29922`))}
-      ${G_(`¿Qué tipos de vínculos predominan?`,z_(O_(L_),e=>R_(e,9)))}
-      ${G_(`¿Cuáles son los issues más centrales?`,U_())}
-      ${G_(`¿Cuánto tiempo llevan abiertos los bugs?`,z_(M_(I_,Date.now()).filter(e=>e.count>0).map(e=>({label:e.bucket,count:e.count})),e=>[`#3fb950`,`#d29922`,`#f85149`,`#6e7681`][e]??`#6e7681`))}
-      ${u.hasXray?G_(`¿Cómo van los tests?`,z_(P_(I_),`#3fb950`)):``}
+      ${J_(`¿En qué estado está el trabajo?`,U_(a))}
+      ${J_(`¿Cómo va cada épica?`,W_(i))}
+      ${J_(`¿Cuánto creamos y cuánto cerramos por semana?`,G_())}
+      ${J_(`¿Dónde se concentran los story points?`,H_(k_(z_,I_(B_)).map(e=>({...e,select:o.has(e.label)?e.label:void 0})),`#a371f7`))}
+      ${J_(`¿Quién tiene más carga?`,H_(A_(z_).map(e=>({...e,url:Y_(e.label===`sin asignar`?`project = ${u.projectKey} AND assignee is EMPTY`:`project = ${u.projectKey} AND assignee = "${e.label}"`)})),`#d29922`))}
+      ${J_(`¿Qué tipos de vínculos predominan?`,H_(j_(B_),e=>V_(e,9)))}
+      ${J_(`¿Cuáles son los issues más centrales?`,K_())}
+      ${J_(`¿Cuánto tiempo llevan abiertos los bugs?`,H_(F_(z_,Date.now()).filter(e=>e.count>0).map(e=>({label:e.bucket,count:e.count})),e=>[`#3fb950`,`#d29922`,`#f85149`,`#6e7681`][e]??`#6e7681`))}
+      ${u.hasXray?J_(`¿Cómo van los tests?`,H_(L_(z_),`#3fb950`)):``}
     </div>
-  `,document.getElementById(`m-from`)?.addEventListener(`change`,t=>{F_={...F_,from:t.target.value||void 0},J_(e)}),document.getElementById(`m-to`)?.addEventListener(`change`,t=>{F_={...F_,to:t.target.value||void 0},J_(e)}),document.getElementById(`m-epic`)?.addEventListener(`change`,t=>{F_={...F_,epicKey:t.target.value||void 0},J_(e)}),document.getElementById(`m-clear`)?.addEventListener(`click`,()=>{F_={},J_(e)}),e.querySelectorAll(`[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null))})}var Y_=A(k()),X_=new Map;for(let e of Y_.values())for(let t of e)X_.set(t.key,(X_.get(t.key)??0)+1);function Z_(e){return D(e.key).find(e=>e.kind===`issue`)}function Q_(e){let t=new Set;for(let n of p){if(!j(n,e))continue;let r=n;for(;r;)t.add(r.key),r=Z_(r)}return t}function $_(e,t,n){let r=p.filter(n=>Z_(n)?.key===e.key&&t.has(n.key)&&y(n,P().filters));if((!y(e,P().filters)||n&&!t.has(e.key))&&r.length===0)return``;let i=r.map(e=>$_(e,t,n)).join(``),a=P().selectedKey===e.key?` selected`:``,o=X_.has(e.key)?`<span class="alert-mark" title="${X_.get(e.key)} alertas">!</span>`:``,s=e.statusCategory===`done`?`done`:e.statusCategory===`indeterminate`?`indeterminate`:`todo`;return`
+  `,document.getElementById(`m-from`)?.addEventListener(`change`,t=>{R_={...R_,from:t.target.value||void 0},Z_(e)}),document.getElementById(`m-to`)?.addEventListener(`change`,t=>{R_={...R_,to:t.target.value||void 0},Z_(e)}),document.getElementById(`m-epic`)?.addEventListener(`change`,t=>{R_={...R_,epicKey:t.target.value||void 0},Z_(e)}),document.getElementById(`m-clear`)?.addEventListener(`click`,()=>{R_={},Z_(e)}),e.querySelectorAll(`[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null))})}var Q_=A(k()),$_=new Map;for(let e of Q_.values())for(let t of e)$_.set(t.key,($_.get(t.key)??0)+1);function ev(e){return D(e.key).find(e=>e.kind===`issue`)}function tv(e){let t=new Set;for(let n of p){if(!j(n,e))continue;let r=n;for(;r;)t.add(r.key),r=ev(r)}return t}function nv(e,t,n){let r=p.filter(n=>ev(n)?.key===e.key&&t.has(n.key)&&y(n,P().filters));if((!y(e,P().filters)||n&&!t.has(e.key))&&r.length===0)return``;let i=r.map(e=>nv(e,t,n)).join(``),a=P().selectedKey===e.key?` selected`:``,o=$_.has(e.key)?`<span class="alert-mark" title="${$_.get(e.key)} alertas">!</span>`:``,s=e.statusCategory===`done`?`done`:e.statusCategory===`indeterminate`?`indeterminate`:`todo`;return`
     <li>
       <button class="node-row${a}" data-select="${U(e.key)}" data-url="${U(e.url)}">
         <span class="dot" style="background:${C(e)}"></span>
@@ -654,10 +657,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         <span class="chip ${s}">${U(e.status??``)}</span>
       </button>
       ${i?`<ul>${i}</ul>`:``}
-    </li>`}function ev(e){let{search:t}=P(),n=Q_(t),r=p.filter(e=>!Z_(e)&&y(e,P().filters)&&(!t||n.has(e.key))).map(e=>$_(e,n,t)).join(``);e.innerHTML=`
+    </li>`}function rv(e){let{search:t}=P(),n=tv(t),r=p.filter(e=>!ev(e)&&y(e,P().filters)&&(!t||n.has(e.key))).map(e=>nv(e,n,t)).join(``);e.innerHTML=`
     <div class="tree">
       ${r?`<ul>${r}</ul>`:`<div class="empty">Ningún issue coincide con la búsqueda o los filtros</div>`}
-    </div>`,e.querySelectorAll(`[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null)),e.addEventListener(`dblclick`,()=>window.open(e.dataset.url,`_blank`,`noopener`))})}var tv=[{id:`tree`,label:`Árbol`},{id:`graph`,label:`Grafo`},{id:`matrix`,label:`Matriz`},{id:`alerts`,label:`Alertas`},{id:`metrics`,label:`Métricas`}],nv=k().length,rv=!1,iv=!1,av=null;te();var ov=document.getElementById(`app`);ov.innerHTML=`
+    </div>`,e.querySelectorAll(`[data-select]`).forEach(e=>{e.addEventListener(`click`,()=>R(e.dataset.select??null)),e.addEventListener(`dblclick`,()=>window.open(e.dataset.url,`_blank`,`noopener`))})}var iv=[{id:`tree`,label:`Árbol`},{id:`graph`,label:`Grafo`},{id:`matrix`,label:`Matriz`},{id:`alerts`,label:`Alertas`},{id:`metrics`,label:`Métricas`}],av=k().length,ov=!1,sv=!1,cv=null;te();var lv=document.getElementById(`app`);lv.innerHTML=`
   <header class="topbar">
     <h1>Trazabilidad ${u.projectKey}</h1>
     <span class="meta">generado ${u.generatedAt.slice(0,16).replace(`T`,` `)} · ${u.counts.nodes} nodos · ${u.counts.edges} vínculos${u.hasXray?` · Xray`:``}</span>
@@ -673,13 +676,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       <div id="detail-body"></div>
     </aside>
   </div>
-`;var sv=document.getElementById(`tabs`),cv=document.getElementById(`filters`),lv=document.getElementById(`view`),uv=document.getElementById(`detail`),dv=document.getElementById(`detail-body`),fv=document.getElementById(`search`);function pv(e){iv=e,uv.classList.toggle(`collapsed`,e);let t=document.getElementById(`toggle-detail`);t.textContent=e?`«`:`»`,t.title=e?`Expandir panel de detalles`:`Colapsar panel de detalles`,p_()}function mv(){let{tab:e}=P();sv.innerHTML=tv.map(({id:t,label:n})=>`<button class="tab${t===e?` active`:``}" data-tab="${t}">${n}${t===`alerts`&&nv>0?`<span class="badge">${nv}</span>`:``}</button>`).join(``),sv.querySelectorAll(`[data-tab]`).forEach(e=>{e.addEventListener(`click`,()=>L(e.dataset.tab))})}function hv(e,t,n,r){return`<h4>${e}</h4>${n.map(e=>`<label class="filter-item"><input type="checkbox" data-fk="${t}" value="${e}"${r.includes(e)?` checked`:``} />${e}</label>`).join(``)}`}function gv(){let{filters:e}=P();cv.classList.toggle(`collapsed`,rv),cv.innerHTML=`
-    <button class="panel-toggle" id="toggle-filters" title="${rv?`Expandir filtros`:`Colapsar filtros`}">${rv?`»`:`«`}</button>
-    ${hv(`Tipo`,`issueTypes`,g,e.issueTypes)}
-    ${hv(`Estado`,`statuses`,_,e.statuses)}
-    ${hv(`Componente`,`components`,v,e.components)}
+`;var uv=document.getElementById(`tabs`),dv=document.getElementById(`filters`),fv=document.getElementById(`view`),pv=document.getElementById(`detail`),mv=document.getElementById(`detail-body`),hv=document.getElementById(`search`);function gv(e){sv=e,pv.classList.toggle(`collapsed`,e);let t=document.getElementById(`toggle-detail`);t.textContent=e?`«`:`»`,t.title=e?`Expandir panel de detalles`:`Colapsar panel de detalles`,p_()}function _v(){let{tab:e}=P();uv.innerHTML=iv.map(({id:t,label:n})=>`<button class="tab${t===e?` active`:``}" data-tab="${t}">${n}${t===`alerts`&&av>0?`<span class="badge">${av}</span>`:``}</button>`).join(``),uv.querySelectorAll(`[data-tab]`).forEach(e=>{e.addEventListener(`click`,()=>L(e.dataset.tab))})}function vv(e,t,n,r){return`<h4>${e}</h4>${n.map(e=>`<label class="filter-item"><input type="checkbox" data-fk="${t}" value="${e}"${r.includes(e)?` checked`:``} />${e}</label>`).join(``)}`}function yv(){let{filters:e}=P();dv.classList.toggle(`collapsed`,ov),dv.innerHTML=`
+    <button class="panel-toggle" id="toggle-filters" title="${ov?`Expandir filtros`:`Colapsar filtros`}">${ov?`»`:`«`}</button>
+    ${vv(`Tipo`,`issueTypes`,g,e.issueTypes)}
+    ${vv(`Estado`,`statuses`,_,e.statuses)}
+    ${vv(`Componente`,`components`,v,e.components)}
     <button class="clear" id="clear-filters">Limpiar filtros</button>
-  `,cv.querySelectorAll(`input[data-fk]`).forEach(e=>{e.addEventListener(`change`,()=>B(e.dataset.fk,e.value))}),document.getElementById(`clear-filters`)?.addEventListener(`click`,V),document.getElementById(`toggle-filters`)?.addEventListener(`click`,()=>{rv=!rv,gv(),p_()})}function _v(){let{tab:e}=P();lv.classList.toggle(`graph-mode`,e===`graph`),e===`tree`?ev(lv):e===`graph`?m_(lv):e===`matrix`?__(lv):e===`alerts`?ie(lv):J_(lv)}function vv(){let{tab:e,selectedKey:t}=P();if(e!==`tree`||!t)return;let n=lv.querySelector(`[data-select="${t}"]`);if(!n)return;let r=n.getBoundingClientRect(),i=lv.getBoundingClientRect();r.top>=i.top&&r.bottom<=i.bottom||(n.scrollIntoView({block:`center`,behavior:`smooth`}),n.classList.add(`flash`),window.setTimeout(()=>n.classList.remove(`flash`),1400))}function yv(){mv(),gv(),_v();let{selectedKey:e,search:t}=P();e&&e!==av&&pv(!1),av=e,uv.classList.toggle(`visible`,!!e),Y(dv,e,t),vv()}document.getElementById(`toggle-detail`)?.addEventListener(`click`,()=>pv(!iv)),fv.addEventListener(`input`,()=>z(fv.value)),document.addEventListener(`keydown`,e=>{e.key===`/`&&document.activeElement!==fv&&(e.preventDefault(),fv.focus()),e.key===`Escape`&&document.activeElement===fv&&fv.blur()}),F(yv),yv();</script>
+  `,dv.querySelectorAll(`input[data-fk]`).forEach(e=>{e.addEventListener(`change`,()=>B(e.dataset.fk,e.value))}),document.getElementById(`clear-filters`)?.addEventListener(`click`,V),document.getElementById(`toggle-filters`)?.addEventListener(`click`,()=>{ov=!ov,yv(),p_()})}function bv(){let{tab:e}=P();fv.classList.toggle(`graph-mode`,e===`graph`),e===`tree`?rv(fv):e===`graph`?m_(fv):e===`matrix`?b_(fv):e===`alerts`?ie(fv):Z_(fv)}function xv(){let{tab:e,selectedKey:t}=P();if(e!==`tree`||!t)return;let n=fv.querySelector(`[data-select="${t}"]`);if(!n)return;let r=n.getBoundingClientRect(),i=fv.getBoundingClientRect();r.top>=i.top&&r.bottom<=i.bottom||(n.scrollIntoView({block:`center`,behavior:`smooth`}),n.classList.add(`flash`),window.setTimeout(()=>n.classList.remove(`flash`),1400))}function Sv(){_v(),yv(),bv();let{selectedKey:e,search:t}=P();e&&e!==cv&&gv(!1),cv=e,pv.classList.toggle(`visible`,!!e),Y(mv,e,t),xv()}document.getElementById(`toggle-detail`)?.addEventListener(`click`,()=>gv(!sv)),hv.addEventListener(`input`,()=>z(hv.value)),document.addEventListener(`keydown`,e=>{e.key===`/`&&document.activeElement!==hv&&(e.preventDefault(),hv.focus()),e.key===`Escape`&&document.activeElement===hv&&hv.blur()}),F(Sv),Sv();</script>
   </head>
   <body>
     <div id="app"></div>
