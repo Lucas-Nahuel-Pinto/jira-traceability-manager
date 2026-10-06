@@ -21,50 +21,50 @@ function issue(key: string, fields: RawIssue['fields'] = {}): RawIssue {
 describe('transformIssues', () => {
   test('builds issue node with url, hierarchy edge from parent', () => {
     const graph = transformIssues(
-      baseInput([issue('BK-2', { summary: 'child', parent: { key: 'BK-1' }, issuetype: { name: 'Story' } })]),
+      baseInput([issue('ACME-2', { summary: 'child', parent: { key: 'ACME-1' }, issuetype: { name: 'Story' } })]),
     );
 
-    const node = graph.nodes.find(n => n.key === 'BK-2');
-    expect(node?.url).toBe('https://acme.atlassian.net/browse/BK-2');
-    expect(node?.parent).toBe('BK-1');
-    expect(graph.edges).toContainEqual({ from: 'BK-1', to: 'BK-2', kind: 'hierarchy' });
+    const node = graph.nodes.find(n => n.key === 'ACME-2');
+    expect(node?.url).toBe('https://acme.atlassian.net/browse/ACME-2');
+    expect(node?.parent).toBe('ACME-1');
+    expect(graph.edges).toContainEqual({ from: 'ACME-1', to: 'ACME-2', kind: 'hierarchy' });
   });
 
   test('outward link: this blocks other', () => {
     const graph = transformIssues(
       baseInput([
-        issue('BK-1', {
+        issue('ACME-1', {
           issuelinks: [
-            { type: { id: '1', name: 'Blocks', inward: 'is blocked by', outward: 'blocks' }, outwardIssue: { key: 'BK-2' } },
+            { type: { id: '1', name: 'Blocks', inward: 'is blocked by', outward: 'blocks' }, outwardIssue: { key: 'ACME-2' } },
           ],
         }),
       ]),
     );
 
-    expect(graph.edges).toContainEqual({ from: 'BK-1', to: 'BK-2', kind: 'link:blocks' });
+    expect(graph.edges).toContainEqual({ from: 'ACME-1', to: 'ACME-2', kind: 'link:blocks' });
   });
 
   test('inward link: other blocks this (direction preserved)', () => {
     const graph = transformIssues(
       baseInput([
-        issue('BK-2', {
+        issue('ACME-2', {
           issuelinks: [
-            { type: { id: '1', name: 'Blocks', inward: 'is blocked by', outward: 'blocks' }, inwardIssue: { key: 'BK-1' } },
+            { type: { id: '1', name: 'Blocks', inward: 'is blocked by', outward: 'blocks' }, inwardIssue: { key: 'ACME-1' } },
           ],
         }),
       ]),
     );
 
-    expect(graph.edges).toContainEqual({ from: 'BK-1', to: 'BK-2', kind: 'link:blocks' });
-    expect(graph.edges.some(e => e.from === 'BK-2' && e.kind === 'link:blocks')).toBe(false);
+    expect(graph.edges).toContainEqual({ from: 'ACME-1', to: 'ACME-2', kind: 'link:blocks' });
+    expect(graph.edges.some(e => e.from === 'ACME-2' && e.kind === 'link:blocks')).toBe(false);
   });
 
   test('same link seen from both issues is deduped', () => {
     const shared = { type: { id: '1', name: 'Blocks', inward: 'is blocked by', outward: 'blocks' } };
     const graph = transformIssues(
       baseInput([
-        issue('BK-1', { issuelinks: [{ ...shared, outwardIssue: { key: 'BK-2' } }] }),
-        issue('BK-2', { issuelinks: [{ ...shared, inwardIssue: { key: 'BK-1' } }] }),
+        issue('ACME-1', { issuelinks: [{ ...shared, outwardIssue: { key: 'ACME-2' } }] }),
+        issue('ACME-2', { issuelinks: [{ ...shared, inwardIssue: { key: 'ACME-1' } }] }),
       ]),
     );
 
@@ -73,17 +73,17 @@ describe('transformIssues', () => {
 
   test('component edge + component node from project components', () => {
     const graph = transformIssues(
-      baseInput([issue('BK-1', { components: [{ id: '7', name: 'Billing' }] })]),
+      baseInput([issue('ACME-1', { components: [{ id: '7', name: 'Billing' }] })]),
     );
 
     expect(graph.nodes.find(n => n.key === 'component:7')?.summary).toBe('Billing');
-    expect(graph.edges).toContainEqual({ from: 'BK-1', to: 'component:7', kind: 'component' });
+    expect(graph.edges).toContainEqual({ from: 'ACME-1', to: 'component:7', kind: 'component' });
   });
 
   test('sprint edge uses active sprint and skips closed', () => {
     const graph = transformIssues(
       baseInput([
-        issue('BK-1', {
+        issue('ACME-1', {
           customfield_100: [
             { id: 1, name: 'Sprint 5', state: 'closed' },
             { id: 2, name: 'Sprint 7', state: 'active' },
@@ -93,18 +93,18 @@ describe('transformIssues', () => {
     );
 
     expect(graph.nodes.find(n => n.key === 'sprint:2')?.summary).toBe('Sprint 7');
-    expect(graph.edges).toContainEqual({ from: 'BK-1', to: 'sprint:2', kind: 'sprint' });
+    expect(graph.edges).toContainEqual({ from: 'ACME-1', to: 'sprint:2', kind: 'sprint' });
     expect(graph.nodes.some(n => n.key === 'sprint:1')).toBe(false);
   });
 
   test('points parsed to number, resolutionDate preserved', () => {
     const graph = transformIssues(
       baseInput([
-        issue('BK-1', { customfield_200: 5, resolutiondate: '2026-10-01T00:00:00.000+0000' }),
+        issue('ACME-1', { customfield_200: 5, resolutiondate: '2026-10-01T00:00:00.000+0000' }),
       ]),
     );
 
-    const node = graph.nodes.find(n => n.key === 'BK-1');
+    const node = graph.nodes.find(n => n.key === 'ACME-1');
     expect(node?.points).toBe(5);
     expect(node?.resolutionDate).toBe('2026-10-01T00:00:00.000+0000');
   });

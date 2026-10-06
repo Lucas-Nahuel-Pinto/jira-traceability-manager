@@ -61,15 +61,15 @@ describe('searchAll pagination', () => {
       calls.push(url);
       const page
         = url.includes('nextPageToken=2')
-          ? { issues: [{ key: 'BK-2' }] }
-          : { issues: [{ key: 'BK-1' }], nextPageToken: '2' };
+          ? { issues: [{ key: 'ACME-2' }] }
+          : { issues: [{ key: 'ACME-1' }], nextPageToken: '2' };
       return new Response(JSON.stringify(page), { status: 200 });
     }) as typeof fetch;
 
     try {
       const client = createJiraClient(env);
       const issues = await client.searchAll<{ key: string }>('project = BK', ['summary']);
-      expect(issues.map(i => i.key)).toEqual(['BK-1', 'BK-2']);
+      expect(issues.map(i => i.key)).toEqual(['ACME-1', 'ACME-2']);
       expect(calls).toHaveLength(2);
       expect(calls[0]).toContain('pageSize=50');
     }

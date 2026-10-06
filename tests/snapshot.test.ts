@@ -14,7 +14,7 @@ function goodSnapshot(): TraceSnapshot {
       counts: { nodes: 1, edges: 0 },
     },
     nodes: [
-      { key: 'BK-1', kind: 'issue', url: 'https://acme.atlassian.net/browse/BK-1', summary: 'x' },
+      { key: 'ACME-1', kind: 'issue', url: 'https://acme.atlassian.net/browse/ACME-1', summary: 'x' },
     ],
     edges: [],
   };
@@ -33,7 +33,7 @@ describe('validateSnapshot', () => {
 
   test('rejects unknown edge kind', () => {
     const snapshot = goodSnapshot();
-    snapshot.edges = [{ from: 'BK-1', to: 'BK-2', kind: 'bogus' }];
+    snapshot.edges = [{ from: 'ACME-1', to: 'ACME-2', kind: 'bogus' }];
     expect(validateSnapshot(snapshot)).toMatchObject({ ok: false });
   });
 

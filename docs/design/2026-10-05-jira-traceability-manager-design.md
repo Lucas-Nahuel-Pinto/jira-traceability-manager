@@ -118,14 +118,14 @@ Jira Cloud (REST v3)  --(1)pull-->  fetch-jira.ts  --(2)transform-->  graph mode
   "meta": { "schemaVersion": 1, "projectKey": "BK", "generatedAt": "ISO8601",
             "counts": { "nodes": 0, "edges": 0 } },
   "nodes": [
-    { "key": "BK-101", "kind": "issue", "issueType": "Story",
+    { "key": "ACME-101", "kind": "issue", "issueType": "Story",
       "summary": "...", "status": "...", "statusCategory": "indeterminate",
       "assignee": "...", "priority": "...", "labels": [], "components": [],
       "sprint": "...", "points": 3, "url": "https://..." }
     // kind: issue | component | sprint | xray
   ],
   "edges": [
-    { "from": "BK-10", "to": "BK-101", "kind": "hierarchy" }
+    { "from": "ACME-10", "to": "ACME-101", "kind": "hierarchy" }
     // kind: hierarchy | link:<linkTypeName> | sprint | component | xray-test
     // dirección preservada: from -> to es outward de `from`
   ]

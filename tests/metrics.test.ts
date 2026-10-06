@@ -22,9 +22,9 @@ function issue(key: string, overrides: Partial<TraceNode> = {}): TraceNode {
 }
 
 const hierarchy: TraceEdge[] = [
-  { from: 'BK-1', to: 'BK-2', kind: 'hierarchy' },
-  { from: 'BK-2', to: 'BK-3', kind: 'hierarchy' },
-  { from: 'BK-1', to: 'BK-9', kind: 'hierarchy' },
+  { from: 'ACME-1', to: 'ACME-2', kind: 'hierarchy' },
+  { from: 'ACME-2', to: 'ACME-3', kind: 'hierarchy' },
+  { from: 'ACME-1', to: 'ACME-9', kind: 'hierarchy' },
 ];
 
 describe('bucketAge', () => {
@@ -71,26 +71,26 @@ describe('throughput', () => {
 
 describe('filterIssues', () => {
   const issues: TraceNode[] = [
-    issue('BK-1', { issueType: 'Epic', createdAt: '2026-01-10T00:00:00Z' }),
-    issue('BK-2', { createdAt: '2026-03-15T00:00:00Z' }),
-    issue('BK-3', { createdAt: '2026-04-01T00:00:00Z' }),
-    issue('BK-9', { createdAt: '2026-09-01T00:00:00Z' }),
-    issue('BK-77', { createdAt: '2026-09-01T00:00:00Z' }),
+    issue('ACME-1', { issueType: 'Epic', createdAt: '2026-01-10T00:00:00Z' }),
+    issue('ACME-2', { createdAt: '2026-03-15T00:00:00Z' }),
+    issue('ACME-3', { createdAt: '2026-04-01T00:00:00Z' }),
+    issue('ACME-9', { createdAt: '2026-09-01T00:00:00Z' }),
+    issue('ACME-77', { createdAt: '2026-09-01T00:00:00Z' }),
   ];
 
   test('epic filter selects the whole subtree', () => {
-    const result = filterIssues(issues, hierarchy, { epicKey: 'BK-1' });
-    expect(result.map(node => node.key).sort()).toEqual(['BK-1', 'BK-2', 'BK-3', 'BK-9']);
+    const result = filterIssues(issues, hierarchy, { epicKey: 'ACME-1' });
+    expect(result.map(node => node.key).sort()).toEqual(['ACME-1', 'ACME-2', 'ACME-3', 'ACME-9']);
   });
 
   test('date range filters by createdAt', () => {
     const result = filterIssues(issues, hierarchy, { from: '2026-04-01', to: '2026-08-31' });
-    expect(result.map(node => node.key)).toEqual(['BK-3']);
+    expect(result.map(node => node.key)).toEqual(['ACME-3']);
   });
 
   test('combined epic + date filter intersects both', () => {
-    const result = filterIssues(issues, hierarchy, { epicKey: 'BK-1', from: '2026-03-01' });
-    expect(result.map(node => node.key).sort()).toEqual(['BK-2', 'BK-3', 'BK-9']);
+    const result = filterIssues(issues, hierarchy, { epicKey: 'ACME-1', from: '2026-03-01' });
+    expect(result.map(node => node.key).sort()).toEqual(['ACME-2', 'ACME-3', 'ACME-9']);
   });
 });
 
