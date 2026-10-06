@@ -101,7 +101,7 @@ body {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
   color: var(--muted); margin: 14px 0 6px;
 }
-.filters h4:first-child { margin-top: 0; }
+.filters h4:first-of-type { margin-top: 0; }
 .filter-item {
   display: flex; gap: 6px; align-items: center; font-size: 12px;
   padding: 2px 0; cursor: pointer; color: var(--text);
@@ -112,6 +112,16 @@ body {
   color: var(--muted); border-radius: 6px; padding: 5px; cursor: pointer; font-size: 12px;
 }
 .filters .clear:hover { color: var(--text); border-color: var(--accent); }
+.panel-toggle {
+  display: block; width: 100%; margin-bottom: 8px;
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
+  border-radius: 6px; padding: 3px 6px; cursor: pointer; font-size: 12px; line-height: 1.3;
+}
+.panel-toggle:hover { color: var(--text); border-color: var(--accent); }
+.filters.collapsed { width: 34px; padding: 8px 4px; }
+.filters.collapsed > :not(.panel-toggle) { display: none; }
+.detail.collapsed { width: 34px; padding: 8px 4px; }
+.detail.collapsed > :not(.panel-toggle) { display: none; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .node-row.flash { animation: row-flash 1.4s ease-out; }
 @keyframes row-flash {
@@ -168,6 +178,8 @@ table.matrix { border-collapse: collapse; font-size: 12px; width: 100%; }
 .detail .jira-link:hover { text-decoration: underline; }
 .metric-link { color: var(--accent); text-decoration: none; }
 .metric-link:hover { text-decoration: underline; }
+.metric-select { color: var(--accent); cursor: pointer; }
+.metric-select:hover { text-decoration: underline; }
 `;
 
 export function injectStyles(): void {

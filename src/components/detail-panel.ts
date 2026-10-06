@@ -63,13 +63,11 @@ function groupSection(label: string, items: { node: TraceNode, arrow: string }[]
 
 export function renderDetail(container: HTMLElement, selectedKey: string | null, search: string): void {
   if (!selectedKey) {
-    container.classList.remove('visible');
     container.innerHTML = '';
     return;
   }
   const node = nodeByKey.get(selectedKey);
   if (!node) {
-    container.classList.remove('visible');
     container.innerHTML = '';
     return;
   }
@@ -103,7 +101,6 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
   }
 
   const searchable = matchesSearch(node, search);
-  container.classList.add('visible');
   container.innerHTML = `
     <div class="key">${escapeHtml(node.key)}</div>
     <h2>${escapeHtml(node.summary ?? '')}</h2>

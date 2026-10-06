@@ -28,14 +28,18 @@ function palette(index: number, total: number): string {
   return `hsl(${hue} 62% 55%)`;
 }
 
-function barChart(slices: { label: string, count: number, url?: string }[], color: string | ((i: number) => string)): string {
+function barChart(slices: { label: string, count: number, url?: string, select?: string }[], color: string | ((i: number) => string)): string {
   const max = Math.max(...slices.map(slice => slice.count), 1);
   const rows = slices.map((slice, index) => {
     const width = Math.round((slice.count / max) * 100);
     const bg = typeof color === 'function' ? color(index) : color;
-    const label = slice.url
-      ? `<a class="metric-link" href="${escapeHtml(slice.url)}" target="_blank" rel="noopener">${escapeHtml(slice.label)}</a>`
-      : escapeHtml(slice.label);
+    let label = escapeHtml(slice.label);
+    if (slice.select) {
+      label = `<span class="metric-select" data-select="${escapeHtml(slice.select)}">${label}</span>`;
+    }
+    else if (slice.url) {
+      label = `<a class="metric-link" href="${escapeHtml(slice.url)}" target="_blank" rel="noopener">${label}</a>`;
+    }
     return `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;">
         <span style="width:150px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);" title="${escapeHtml(slice.label)}">${label}</span>
@@ -48,7 +52,7 @@ function barChart(slices: { label: string, count: number, url?: string }[], colo
   return rows || '<div class="empty">Sin datos</div>';
 }
 
-function donut(slices: { label: string, count: number }[]): string {
+function donut(slices: { label: string, count: number, url?: string }[]): string {
   const total = slices.reduce((sum, slice) => sum + slice.count, 0);
   if (total === 0) { return '<div class="empty">Sin datos</div>'; }
   let cursor = 0;
@@ -58,12 +62,17 @@ function donut(slices: { label: string, count: number }[]): string {
     const end = (cursor / total) * 360;
     return `${palette(index, slices.length)} ${start}deg ${end}deg`;
   }).join(', ');
-  const legend = slices.map((slice, index) => `
+  const legend = slices.map((slice, index) => {
+    const label = slice.url
+      ? `<a class="metric-link" href="${escapeHtml(slice.url)}" target="_blank" rel="noopener">${escapeHtml(slice.label)}</a>`
+      : escapeHtml(slice.label);
+    return `
     <div style="display:flex;gap:6px;align-items:center;font-size:12px;margin-bottom:3px;">
       <span class="dot" style="background:${palette(index, slices.length)}"></span>
-      <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(slice.label)}</span>
+      <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</span>
       <span style="margin-left:auto;font-family:var(--mono);">${slice.count}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   return `
     <div style="display:flex;gap:16px;align-items:center;">
       <div style="width:120px;height:120px;flex:none;border-radius:50%;background:conic-gradient(${stops});"></div>
@@ -71,7 +80,7 @@ function donut(slices: { label: string, count: number }[]): string {
     </div>`;
 }
 
-function stackedEpics(statusColors: Map<string, string>, urlByKey: Map<string, string>): string {
+function stackedEpics(statusColors: Map<string, string>): string {
   const progress = epicProgress(visibleIssues, parentMap(visibleEdges));
   if (progress.length === 0) { return '<div class="empty">Sin datos</div>'; }
   const rows = progress.slice(0, 12).map((entry) => {
@@ -81,13 +90,9 @@ function stackedEpics(statusColors: Map<string, string>, urlByKey: Map<string, s
       return `<span title="${escapeHtml(slice.label)}: ${slice.count}" style="width:${width}%;background:${color};"></span>`;
     }).join('');
     const pct = Math.round((entry.done / entry.total) * 100);
-    const epicUrl = urlByKey.get(entry.epic);
-    const epicCell = epicUrl
-      ? `<a class="metric-link" href="${escapeHtml(epicUrl)}" target="_blank" rel="noopener" style="width:110px;flex:none;font-family:var(--mono);">${escapeHtml(entry.epic)}</a>`
-      : `<span style="width:110px;flex:none;font-family:var(--mono);color:var(--accent);">${escapeHtml(entry.epic)}</span>`;
     return `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;">
-        ${epicCell}
+        <span class="metric-select" data-select="${escapeHtml(entry.epic)}" style="width:110px;flex:none;font-family:var(--mono);">${escapeHtml(entry.epic)}</span>
         <span style="flex:1;display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--panel-2);">${segments}</span>
         <span style="width:74px;text-align:right;color:var(--muted);">${entry.done}/${entry.total} (${pct}%)</span>
       </div>`;
@@ -148,12 +153,9 @@ function widget(title: string, body: string): string {
     </section>`;
 }
 
-function assigneeJqlUrl(assignee: string): string {
+function jiraJqlUrl(jql: string): string {
   const base = allIssues[0]?.url.replace(/\/browse\/[^/]+$/, '');
   if (!base) { return ''; }
-  const jql = assignee === 'sin asignar'
-    ? `project = ${meta.projectKey} AND assignee is EMPTY`
-    : `project = ${meta.projectKey} AND assignee = "${assignee}"`;
   return `${base}/issues/?jql=${encodeURIComponent(jql)}`;
 }
 
@@ -170,6 +172,12 @@ export function renderMetrics(container: HTMLElement): void {
   const alertTotal = computeAlerts().length;
   const statusSlices = statusDistribution(visibleIssues);
   const statusColors = new Map(statusSlices.map((slice, index) => [slice.label, palette(index, statusSlices.length)]));
+  const statusSlicesLinked = statusSlices.map(slice => ({
+    ...slice,
+    url: slice.label === 'sin estado'
+      ? undefined
+      : jiraJqlUrl(`project = ${meta.projectKey} AND status = "${slice.label}"`),
+  }));
   const urlByKey = new Map(allIssues.map(issue => [issue.key, issue.url]));
   const epics = allIssues
     .filter(issue => issue.issueType === 'Epic')
@@ -202,11 +210,16 @@ export function renderMetrics(container: HTMLElement): void {
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;">
-      ${widget('¿En qué estado está el trabajo?', donut(statusSlices))}
-      ${widget('¿Cómo va cada épica?', stackedEpics(statusColors, urlByKey))}
+      ${widget('¿En qué estado está el trabajo?', donut(statusSlicesLinked))}
+      ${widget('¿Cómo va cada épica?', stackedEpics(statusColors))}
       ${widget('¿Cuánto creamos y cuánto cerramos por semana?', throughputChart())}
-      ${widget('¿Dónde se concentran los story points?', barChart(pointsByEpic(visibleIssues, parentMap(visibleEdges)).map(slice => ({ ...slice, url: urlByKey.get(slice.label) })), '#a371f7'))}
-      ${widget('¿Quién tiene más carga?', barChart(workload(visibleIssues).map(slice => ({ ...slice, url: assigneeJqlUrl(slice.label) })), '#d29922'))}
+      ${widget('¿Dónde se concentran los story points?', barChart(pointsByEpic(visibleIssues, parentMap(visibleEdges)).map(slice => ({ ...slice, select: urlByKey.has(slice.label) ? slice.label : undefined })), '#a371f7'))}
+      ${widget('¿Quién tiene más carga?', barChart(workload(visibleIssues).map(slice => ({
+        ...slice,
+        url: jiraJqlUrl(slice.label === 'sin asignar'
+          ? `project = ${meta.projectKey} AND assignee is EMPTY`
+          : `project = ${meta.projectKey} AND assignee = "${slice.label}"`),
+      })), '#d29922'))}
       ${widget('¿Qué tipos de vínculos predominan?', barChart(linkKindCounts(visibleEdges), i => palette(i, 9)))}
       ${widget('¿Cuáles son los issues más centrales?', centralTable())}
       ${widget('¿Cuánto tiempo llevan abiertos los bugs?', barChart(bugAging(visibleIssues, Date.now()).filter(entry => entry.count > 0).map(entry => ({ label: entry.bucket, count: entry.count })), i => ['#3fb950', '#d29922', '#f85149', '#6e7681'][i] ?? '#6e7681'))}
@@ -230,7 +243,7 @@ export function renderMetrics(container: HTMLElement): void {
     filter = {};
     renderMetrics(container);
   });
-  container.querySelectorAll<HTMLElement>('tr[data-select]').forEach((row) => {
+  container.querySelectorAll<HTMLElement>('[data-select]').forEach((row) => {
     row.addEventListener('click', () => select(row.dataset.select ?? null));
   });
 }

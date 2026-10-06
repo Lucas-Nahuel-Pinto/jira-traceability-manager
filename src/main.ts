@@ -4,7 +4,7 @@ import { components, computeAlerts, issues, issueTypes, meta, statuses } from '.
 import { clearFilters, getState, select, setSearch, setTab, subscribe, toggleFilter } from './state.ts';
 import { injectStyles } from './styles.ts';
 import { renderAlerts } from './views/alerts.ts';
-import { renderGraph } from './views/graph.ts';
+import { renderGraph, resizeGraph } from './views/graph.ts';
 import { renderMatrix } from './views/matrix.ts';
 import { renderMetrics } from './views/metrics.ts';
 import { renderTree } from './views/tree.ts';
@@ -18,6 +18,10 @@ const TABS: { id: TabId, label: string }[] = [
 ];
 
 const alertCount = computeAlerts().length;
+
+let filtersCollapsed = false;
+let detailCollapsed = false;
+let lastSelectedKey: string | null = null;
 
 injectStyles();
 
@@ -33,7 +37,10 @@ app.innerHTML = `
   <div class="workspace">
     <nav class="filters" id="filters"></nav>
     <main class="view" id="view"></main>
-    <aside class="detail" id="detail"></aside>
+    <aside class="detail" id="detail">
+      <button class="panel-toggle" id="toggle-detail" title="Colapsar panel de detalles">»</button>
+      <div id="detail-body"></div>
+    </aside>
   </div>
 `;
 
@@ -41,7 +48,17 @@ const tabsEl = document.getElementById('tabs') as HTMLElement;
 const filtersEl = document.getElementById('filters') as HTMLElement;
 const viewEl = document.getElementById('view') as HTMLElement;
 const detailEl = document.getElementById('detail') as HTMLElement;
+const detailBodyEl = document.getElementById('detail-body') as HTMLElement;
 const searchEl = document.getElementById('search') as HTMLInputElement;
+
+function setDetailCollapsed(collapsed: boolean): void {
+  detailCollapsed = collapsed;
+  detailEl.classList.toggle('collapsed', collapsed);
+  const button = document.getElementById('toggle-detail') as HTMLButtonElement;
+  button.textContent = collapsed ? '«' : '»';
+  button.title = collapsed ? 'Expandir panel de detalles' : 'Colapsar panel de detalles';
+  resizeGraph();
+}
 
 function renderTabs(): void {
   const { tab } = getState();
@@ -65,7 +82,9 @@ function filterGroup(title: string, kind: 'issueTypes' | 'statuses' | 'component
 
 function renderFilters(): void {
   const { filters } = getState();
+  filtersEl.classList.toggle('collapsed', filtersCollapsed);
   filtersEl.innerHTML = `
+    <button class="panel-toggle" id="toggle-filters" title="${filtersCollapsed ? 'Expandir filtros' : 'Colapsar filtros'}">${filtersCollapsed ? '»' : '«'}</button>
     ${filterGroup('Tipo', 'issueTypes', issueTypes, filters.issueTypes)}
     ${filterGroup('Estado', 'statuses', statuses, filters.statuses)}
     ${filterGroup('Componente', 'components', components, filters.components)}
@@ -75,6 +94,11 @@ function renderFilters(): void {
     input.addEventListener('change', () => toggleFilter(input.dataset.fk as 'issueTypes', input.value));
   });
   document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
+  document.getElementById('toggle-filters')?.addEventListener('click', () => {
+    filtersCollapsed = !filtersCollapsed;
+    renderFilters();
+    resizeGraph();
+  });
 }
 
 function renderView(): void {
@@ -106,9 +130,14 @@ function render(): void {
   renderFilters();
   renderView();
   const { selectedKey, search } = getState();
-  renderDetail(detailEl, selectedKey, search);
+  if (selectedKey && selectedKey !== lastSelectedKey) { setDetailCollapsed(false); }
+  lastSelectedKey = selectedKey;
+  detailEl.classList.toggle('visible', Boolean(selectedKey));
+  renderDetail(detailBodyEl, selectedKey, search);
   focusSelectedInTree();
 }
+
+document.getElementById('toggle-detail')?.addEventListener('click', () => setDetailCollapsed(!detailCollapsed));
 
 searchEl.addEventListener('input', () => setSearch(searchEl.value));
 document.addEventListener('keydown', (event) => {

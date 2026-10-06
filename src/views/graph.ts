@@ -172,6 +172,10 @@ function buildElements(cached: Map<string, Position> | undefined): cytoscape.Ele
   return elements;
 }
 
+export function resizeGraph(): void {
+  instance?.resize();
+}
+
 export function renderGraph(container: HTMLElement): void {
   if (building) { return; }
   const sig = filtersSignature();
