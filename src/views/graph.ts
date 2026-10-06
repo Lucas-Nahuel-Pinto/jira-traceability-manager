@@ -1,7 +1,8 @@
+import type { TraceNode } from '../../scripts/lib/trace-types.ts';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 import { escapeHtml } from '../components/detail-panel.ts';
-import { edges, issues, issueTypes, nodeByKey, passesFilters, typeColorOf } from '../model.ts';
+import { edges, issues, issueTypes, nodeByKey, parentsOf, passesFilters, typeColorOf } from '../model.ts';
 import { getState, select } from '../state.ts';
 
 cytoscape.use(fcose);
@@ -25,13 +26,28 @@ function filtersSignature(): string {
   });
 }
 
+function filterScope(): Set<string> {
+  const { filters } = getState();
+  const scope = new Set<string>();
+  for (const issue of issues) {
+    if (!passesFilters(issue, filters)) { continue; }
+    let current: TraceNode | undefined = issue;
+    while (current) {
+      scope.add(current.key);
+      current = parentsOf(current.key).find(parent => parent.kind === 'issue');
+    }
+  }
+  return scope;
+}
+
 function updateInstance(cy: cytoscape.Core): void {
-  const { filters, search, selectedKey } = getState();
+  const { search, selectedKey } = getState();
   const needle = search.toLowerCase();
+  const scope = filterScope();
   cy.batch(() => {
     cy.nodes().forEach((node) => {
       const traceNode = nodeByKey.get(node.id());
-      const visible = traceNode ? passesFilters(traceNode, filters) : true;
+      const visible = traceNode ? scope.has(traceNode.key) : true;
       node.toggleClass('hidden', !visible);
       const matches = !needle || !visible
         ? false
@@ -150,9 +166,8 @@ function cachePositions(cy: cytoscape.Core, sig: string): void {
 }
 
 function buildElements(cached: Map<string, Position> | undefined): cytoscape.ElementDefinition[] {
-  const { filters } = getState();
-  const visibleIssues = issues.filter(issue => passesFilters(issue, filters));
-  const visibleKeys = new Set(visibleIssues.map(issue => issue.key));
+  const scope = filterScope();
+  const visibleIssues = issues.filter(issue => scope.has(issue.key));
   const elements: cytoscape.ElementDefinition[] = visibleIssues.map((issue) => {
     const position = cached?.get(issue.key);
     return {
@@ -163,7 +178,7 @@ function buildElements(cached: Map<string, Position> | undefined): cytoscape.Ele
     };
   });
   for (const edge of edges) {
-    if (!visibleKeys.has(edge.from) || !visibleKeys.has(edge.to)) { continue; }
+    if (!scope.has(edge.from) || !scope.has(edge.to)) { continue; }
     elements.push({
       group: 'edges',
       data: { id: `${edge.from}|${edge.to}|${edge.kind}`, source: edge.from, target: edge.to, kind: edge.kind },
