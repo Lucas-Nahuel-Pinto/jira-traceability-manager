@@ -124,6 +124,10 @@ body {
   flex: 1; min-height: 480px; border: 1px solid var(--border);
   border-radius: 8px; overflow: hidden; position: relative; background: var(--panel);
 }
+.graph-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(15, 18, 24, 0.82); color: var(--muted); font-size: 13px; z-index: 5;
+}
 .matrix-wrap {
   overflow: auto; max-height: calc(100vh - 160px);
   border: 1px solid var(--border); border-radius: 8px; background: var(--panel);
