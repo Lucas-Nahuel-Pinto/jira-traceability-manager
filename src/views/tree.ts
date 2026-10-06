@@ -1,4 +1,5 @@
 import type { TraceNode } from '../../scripts/lib/trace-types.ts';
+import type { Filters } from '../state.ts';
 import { escapeHtml } from '../components/detail-panel.ts';
 import { alertsByType, computeAlerts, issues, matchesSearch, nodeColor, parentsOf, passesFilters } from '../model.ts';
 import { getState, select } from '../state.ts';
@@ -28,13 +29,26 @@ function buildVisibleSet(query: string): Set<string> {
   return visible;
 }
 
-function renderNode(node: TraceNode, visible: Set<string>, query: string): string {
+function buildFilterScope(filters: Filters): Set<string> {
+  const scope = new Set<string>();
+  for (const issue of issues) {
+    if (!passesFilters(issue, filters)) { continue; }
+    let current: TraceNode | undefined = issue;
+    while (current) {
+      scope.add(current.key);
+      current = issueParent(current);
+    }
+  }
+  return scope;
+}
+
+function renderNode(node: TraceNode, visible: Set<string>, scope: Set<string>, query: string): string {
   const children = issues.filter(child => issueParent(child)?.key === node.key
     && visible.has(child.key)
-    && passesFilters(child, getState().filters));
-  const selfVisible = passesFilters(node, getState().filters) && (!query || visible.has(node.key));
-  if (!selfVisible && children.length === 0) { return ''; }
-  const childHtml = children.map(child => renderNode(child, visible, query)).join('');
+    && scope.has(child.key));
+  const childHtml = children.map(child => renderNode(child, visible, scope, query)).join('');
+  const selfVisible = scope.has(node.key) && (!query || visible.has(node.key));
+  if (!selfVisible && !childHtml) { return ''; }
   const selected = getState().selectedKey === node.key ? ' selected' : '';
   const alertBadge = alerted.has(node.key) ? `<span class="alert-mark" title="${alerted.get(node.key)} alertas">!</span>` : '';
   const category = node.statusCategory === 'done' ? 'done' : node.statusCategory === 'indeterminate' ? 'indeterminate' : 'todo';
@@ -53,12 +67,13 @@ function renderNode(node: TraceNode, visible: Set<string>, query: string): strin
 }
 
 export function renderTree(container: HTMLElement): void {
-  const { search } = getState();
+  const { search, filters } = getState();
   const visible = buildVisibleSet(search);
+  const scope = buildFilterScope(filters);
   const roots = issues.filter(issue => !issueParent(issue)
-    && passesFilters(issue, getState().filters)
+    && scope.has(issue.key)
     && (!search || visible.has(issue.key)));
-  const rows = roots.map(root => renderNode(root, visible, search)).join('');
+  const rows = roots.map(root => renderNode(root, visible, scope, search)).join('');
   container.innerHTML = `
     <div class="tree">
       ${rows ? `<ul>${rows}</ul>` : '<div class="empty">Ningún issue coincide con la búsqueda o los filtros</div>'}
