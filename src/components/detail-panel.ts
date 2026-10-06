@@ -39,13 +39,18 @@ const VERBS: Record<string, { out: string, in: string }> = {
   'link:test-execute': { out: 'ejecuta', in: 'ejecutado por' },
   'link:test-design': { out: 'diseña', in: 'diseñado por' },
   'link:defect': { out: 'defecto en', in: 'defecto de' },
-  'link:problem/incident': { out: 'problema/incidente', in: 'afectado por' },
+  'link:problem/incident': { out: 'causa', in: 'es causado por' },
   'link:dependencies': { out: 'depende de', in: 'es dependencia para' },
 };
 
-function relationLabel(kind: string, outward: boolean): string {
+const FEMININE_TYPES = new Set(['Story', 'Precondition']);
+
+function relationLabel(kind: string, outward: boolean, selectedType: string): string {
   if (kind === 'component') { return 'componente'; }
   if (kind === 'sprint') { return 'sprint'; }
+  if (kind === 'link:problem/incident' && !outward) {
+    return FEMININE_TYPES.has(selectedType) ? 'es causada por' : 'es causado por';
+  }
   const verb = VERBS[kind];
   if (verb) { return outward ? verb.out : verb.in; }
   return kind.replace(/^link:/, '');
@@ -87,7 +92,7 @@ export function renderDetail(container: HTMLElement, selectedKey: string | null,
     const outward = edge.from === selectedKey;
     const other = nodeByKey.get(outward ? edge.to : edge.from);
     if (!other) { continue; }
-    const label = relationLabel(edge.kind, outward);
+    const label = relationLabel(edge.kind, outward, node.issueType ?? '');
     const bucket = groups.get(label) ?? [];
     bucket.push({ node: other, arrow: outward ? '→' : '←' });
     groups.set(label, bucket);
