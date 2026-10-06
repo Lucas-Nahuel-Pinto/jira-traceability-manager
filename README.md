@@ -26,10 +26,19 @@ Open `dist/index.html` with double click — no server, no auth in the browser.
 | Tab | What it answers |
 | --- | --- |
 | Árbol | Jerarquía épica → story → bug con estado, alertas inline, clic = detalle, doble clic = abrir en Jira |
-| Grafo | Grafo force-directed (Cytoscape) de issues y vínculos, con filtros y búsqueda |
-| Matriz | Issues × tipos de vínculo con dirección, más el bloque de "quién bloquea a quién" |
+| Grafo | Grafo force-directed (Cytoscape + fcose, con caché de posiciones por combinación de filtros), filtros y búsqueda |
+| Matriz | Issues × tipos de vínculo con dirección, columnas ordenables, más el bloque de "quién bloquea a quién" |
 | Alertas | Stories sin épica, épicas vacías, bugs sin story, bloqueos abiertos |
 | Métricas | 6 KPIs + widgets-pregunta (estado, épicas, throughput, puntos, carga, vínculos, centrales, aging de bugs) con filtro por fechas y subárbol de épica |
+
+## Interaction details
+
+- Filters and detail panels are collapsible (the `«` / `»` button on each title).
+- Filters and search show ancestor context in Árbol and Grafo: an Epic stays visible (with its real status chip) above matching Stories/Tests even when the Epic itself fails the status filter.
+- Graph selection illuminates the node and its connections; tapping empty canvas deselects. First load after a filter change computes the layout (progress overlay); revisiting the same filters is instant from cache.
+- Matrix headers sort ascending/descending on click; clicking any row (matrix, alerts, metrics, detail links) opens it in the detail panel.
+- Metrics status names and assignees link to Jira JQL queries; epic keys open the detail panel in-app. Status colors are shared across donut, stacked bars, and the rest of the app.
+- Problem/Incident links in the detail panel read as `causa` / `es causado por` in the link direction.
 
 ## Fail-safe
 
